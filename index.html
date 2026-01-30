@@ -21,6 +21,7 @@
       --text: #1f2937;
       --input-bg: #f9fafb;
       --canto-color: #22c55e; /* Color verde brillante para el canto */
+      --share-color: #6366f1; /* Color índigo para compartir */
     }
 
     * {
@@ -342,10 +343,17 @@
 
     .share-actions {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr;
         gap: 10px;
         padding-top: 15px;
         border-top: 1px solid var(--border);
+    }
+
+    .fallback-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 10px;
     }
 
     .btn {
@@ -382,13 +390,26 @@
       color: var(--danger);
     }
     
+    .btn-share {
+        background-color: var(--share-color);
+        color: white;
+        box-shadow: 0 4px 6px rgba(99, 102, 241, 0.4);
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+    }
+
     .btn-whatsapp {
         background-color: #25D366;
         color: white;
+        font-size: 0.85rem;
+        padding: 8px;
     }
     .btn-email {
         background-color: #0078d4;
         color: white;
+        font-size: 0.85rem;
+        padding: 8px;
     }
 
     /* Leyenda Modal/Toggle */
@@ -524,22 +545,30 @@
              <button type="button" class="btn btn-danger" id="clearTableBtn" style="font-size: 0.9rem;">
               <i data-lucide="trash-2"></i> Borrar Todo
             </button>
-            <button type="button" class="btn btn-primary" id="submitBtn" style="flex:1;">
-              <i data-lucide="download"></i> 1. Generar Excel
+            <button type="button" class="btn btn-primary" id="downloadBtn" onclick="downloadExcelOnly()" style="flex:1;">
+              <i data-lucide="download"></i> Descargar Excel
             </button>
         </div>
 
         <!-- Acciones Compartir -->
-         <div style="text-align: center; font-size: 0.8rem; color: #666; margin-bottom: -5px;">
-            Descarga el Excel primero y luego envíalo:
-         </div>
         <div class="share-actions">
-            <button type="button" class="btn btn-email" onclick="sendEmail()">
-                <i data-lucide="mail"></i> 2. Enviar Email
+            <!-- BOTÓN MÁGICO PARA MÓVIL -->
+            <button type="button" class="btn btn-share" onclick="shareNative()">
+                <i data-lucide="share-2"></i> Compartir Excel (App Móvil)
             </button>
-            <button type="button" class="btn btn-whatsapp" onclick="sendWhatsApp()">
-                <i data-lucide="message-circle"></i> 2. Enviar WhatsApp
-            </button>
+            
+            <div style="text-align: center; margin: 10px 0; font-size: 0.8rem; color: #666;">
+                O usa los enlaces manuales (PC):
+            </div>
+
+            <div class="fallback-links">
+                <button type="button" class="btn btn-email" onclick="sendEmail()">
+                    <i data-lucide="mail"></i> Email (Link)
+                </button>
+                <button type="button" class="btn btn-whatsapp" onclick="sendWhatsApp()">
+                    <i data-lucide="message-circle"></i> WhatsApp (Link)
+                </button>
+            </div>
         </div>
       </div>
     </form>
@@ -586,7 +615,6 @@
     function createRowHTML(data = {}) {
         const row = document.createElement("tr");
         
-        // Generar opciones del select
         let optionsHTML = `<option value="">- Selec -</option>`;
         cantosOptions.forEach(opt => {
             const selected = (data.canteado === opt.val) ? 'selected' : '';
@@ -630,7 +658,6 @@
           </td>
         `;
         
-        // Inicializar el preview visual inmediatamente después de crear
         setTimeout(() => {
             const select = row.querySelector('.input-canto');
             updatePreviewBox(select);
@@ -639,44 +666,32 @@
         return row;
     }
     
-    // Función para manejar el cambio en el select y actualizar todo
     window.handleCantoChange = function(selectElement) {
         updatePreviewBox(selectElement);
         saveData();
         updateStats();
     }
 
-    // Función que pinta los bordes del recuadro
     function updatePreviewBox(selectElement) {
         const val = selectElement.value;
-        const box = selectElement.nextElementSibling; // El div .preview-box
+        const box = selectElement.nextElementSibling;
         
-        // Resetear clases
         box.className = 'preview-box';
-        
-        // Lógica de mapeo: 
-        // Largo (L) = Arriba y Abajo (Horizontal)
-        // Ancho (A) = Izquierda y Derecha (Vertical)
         
         if (val.includes("4C")) {
             box.classList.add("c-top", "c-bottom", "c-left", "c-right");
         } else if (val === "SIN CANTO") {
             // nada
         } else {
-            // Lógica combinatoria
-            // Revisar Largos (L)
             if (val.includes("2CL")) {
                 box.classList.add("c-top", "c-bottom");
             } else if (val.includes("1CL")) {
-                box.classList.add("c-top"); // Por convención visual
+                box.classList.add("c-top");
             }
-            
-            // Revisar Anchos (A o CA)
-            // Cuidado: "1CL 1CA" contiene "1CA", pero "1CA" solo también.
             if (val.includes("2CA")) {
                 box.classList.add("c-left", "c-right");
             } else if (val.includes("1CA")) {
-                box.classList.add("c-right"); // Por convención visual
+                box.classList.add("c-right");
             }
         }
     }
@@ -726,7 +741,7 @@
     document.getElementById("clearTableBtn").addEventListener("click", function() {
       if(confirm("¿Estás seguro de vaciar toda la tabla?")) {
         tableBody.innerHTML = "";
-        addNewRow(); // Añadir una limpia
+        addNewRow(); 
         localStorage.removeItem("gabarroData");
         updateStats();
       }
@@ -829,45 +844,38 @@
         document.getElementById("legendBox").classList.toggle("show");
     }
 
-    // --- FUNCIONES DE ENVÍO ---
+    // --- LÓGICA DE EXCEL Y COMPARTIR ---
 
-    function getSummaryText() {
-        const nombre = document.getElementById("nombre").value || "Cliente Desconocido";
-        const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
-        const totalP = document.getElementById("totalPieces").textContent;
-        const totalM = document.getElementById("totalArea").textContent;
-        const totalC = document.getElementById("totalCanto").textContent;
+    // 1. Validar Datos
+    function validateForm() {
+        const nombre = document.getElementById("nombre").value.trim();
+        const telefono = document.getElementById("telefono").value.trim();
         
-        return `Hola, soy ${nombre}. Adjunto el Excel para ${tipo}.%0A%0AResumen:%0A- ${totalP}%0A- ${totalM}%0A- ${totalC}%0A%0APor favor, confirmad recepción.`;
+        if (!nombre || !telefono) {
+            alert("Por favor, indica al menos el Nombre y Teléfono.");
+            return false;
+        }
+
+        // Verificar filas vacías
+        const rows = tableBody.querySelectorAll("tr");
+        let hasData = false;
+        rows.forEach(row => {
+            if(row.querySelector(".input-mat").value || row.querySelector(".input-largo").value) hasData = true;
+        });
+
+        if(!hasData) {
+            alert("La tabla está vacía. Añade al menos una medida.");
+            return false;
+        }
+        return true;
     }
 
-    window.sendEmail = function() {
-        const subject = `Nuevo Pedido Gabarró - ${document.getElementById("nombre").value}`;
-        const body = getSummaryText().replace(/%0A/g, "%0D%0A"); // Salto de línea email
-        // Nota: NO se puede adjuntar archivo via mailto, el usuario debe hacerlo
-        alert("Se abrirá tu correo. RECUERDA: Debes adjuntar manualmente el archivo Excel descargado.");
-        window.location.href = `mailto:marcos.sanchez@gabarro.com?subject=${subject}&body=${body}`;
-    };
-
-    window.sendWhatsApp = function() {
-        const phone = "34669228010";
-        const text = getSummaryText();
-        alert("Se abrirá WhatsApp. RECUERDA: Debes arrastrar/adjuntar el archivo Excel al chat.");
-        window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
-    };
-
-    // --- EXCEL GENERATION ---
-    document.getElementById("submitBtn").addEventListener("click", function () {
+    // 2. Generar Datos Excel (Común para Descargar y Compartir)
+    function getExcelData() {
         const nombre = document.getElementById("nombre").value.trim();
         const email = document.getElementById("email").value.trim();
         const telefono = document.getElementById("telefono").value.trim();
         const codigo = document.getElementById("codigoCliente").value.trim();
-        
-        if (!nombre || !telefono) {
-            alert("Por favor, indica al menos el Nombre y Teléfono.");
-            return;
-        }
-
         const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
         const fecha = document.getElementById("fecha").value;
 
@@ -884,8 +892,6 @@
         ];
 
         const rows = tableBody.querySelectorAll("tr");
-        let hasData = false;
-
         rows.forEach(row => {
             const mat = row.querySelector(".input-mat").value;
             const lar = row.querySelector(".input-largo").value;
@@ -893,7 +899,6 @@
             const uds = row.querySelector(".input-uds").value;
 
             if(mat || (lar && anc)) {
-                hasData = true;
                 dataRows.push([
                     row.querySelector(".input-canto").value,
                     row.querySelector(".input-ref").value,
@@ -906,29 +911,81 @@
             }
         });
 
-        if(!hasData) {
-            alert("La tabla está vacía. Añade al menos una medida.");
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(dataRows);
+        ws['!cols'] = [ {wch:15}, {wch:25}, {wch:30}, {wch:8}, {wch:10}, {wch:10}, {wch:8} ];
+        XLSX.utils.book_append_sheet(wb, ws, "Produccion");
+
+        // Nombre archivo
+        const cleanName = nombre.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const fileName = `Gabarro_${tipo}_${cleanName}.xlsx`;
+
+        return { wb, fileName };
+    }
+
+    // 3. Descarga Normal (PC)
+    function downloadExcelOnly() {
+        if(!validateForm()) return;
+        const { wb, fileName } = getExcelData();
+        XLSX.writeFile(wb, fileName);
+    }
+
+    // 4. Compartir Nativo (Móvil - Adjunto Automático)
+    async function shareNative() {
+        if(!validateForm()) return;
+        
+        // Comprobar soporte
+        if (!navigator.canShare || !navigator.share) {
+            alert("Tu navegador no soporta compartir archivos nativamente. Por favor, usa los botones de abajo (Email/WhatsApp) y adjunta el archivo manualmente.");
             return;
         }
 
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(dataRows);
+        const { wb, fileName } = getExcelData();
         
-        ws['!cols'] = [
-            { wch: 15 }, 
-            { wch: 25 }, 
-            { wch: 30 }, 
-            { wch: 8 }, 
-            { wch: 10 }, 
-            { wch: 10 }, 
-            { wch: 8 } 
-        ];
+        // Convertir Workbook a Blob
+        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        
+        // Crear File Object
+        const file = new File([blob], fileName, { type: blob.type });
 
-        XLSX.utils.book_append_sheet(wb, ws, "Produccion");
-        const cleanName = nombre.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        const fileName = `Gabarro_${tipo}_${cleanName}.xlsx`;
-        XLSX.writeFile(wb, fileName);
-    });
+        // Intentar compartir
+        if (navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({
+                    title: 'Pedido Gabarró',
+                    text: `Adjunto pedido de ${document.getElementById("nombre").value}`,
+                    files: [file]
+                });
+            } catch (err) {
+                console.error("Error compartiendo:", err);
+            }
+        } else {
+            alert("Tu dispositivo no permite compartir este tipo de archivo automáticamente.");
+        }
+    }
+
+    // 5. Fallback Manuales
+    function getSummaryText() {
+        const nombre = document.getElementById("nombre").value || "Cliente";
+        const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
+        const totalP = document.getElementById("totalPieces").textContent;
+        return `Hola, soy ${nombre}. Envío Excel para ${tipo}. Resumen: ${totalP}.`;
+    }
+
+    window.sendEmail = function() {
+        const subject = `Nuevo Pedido Gabarró - ${document.getElementById("nombre").value}`;
+        const body = getSummaryText();
+        alert("Se abrirá tu correo. RECUERDA: Debes adjuntar el archivo manualmente.");
+        window.location.href = `mailto:marcos.sanchez@gabarro.com?subject=${subject}&body=${body}`;
+    };
+
+    window.sendWhatsApp = function() {
+        const phone = "34669228010";
+        const text = getSummaryText();
+        alert("Se abrirá WhatsApp. RECUERDA: Debes adjuntar el archivo manualmente.");
+        window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+    };
 
   </script>
 </body>
