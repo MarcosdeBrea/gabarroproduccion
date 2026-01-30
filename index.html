@@ -11,6 +11,7 @@
   
   <style>
     :root {
+      /* Variables Modo Claro (Por defecto) */
       --primary: #6AAB64;
       --primary-dark: #4e8549;
       --secondary: #2c3e50;
@@ -19,9 +20,34 @@
       --border: #e5e7eb;
       --danger: #ef4444;
       --text: #1f2937;
+      --text-muted: #6b7280;
       --input-bg: #f9fafb;
-      --canto-color: #22c55e; /* Color verde brillante para el canto */
-      --share-color: #6366f1; /* Color índigo para compartir */
+      --canto-color: #22c55e;
+      --preview-box-bg: #e5e7eb;
+      --preview-box-border: #9ca3af;
+      --legend-bg: #f0fdf4;
+      --readonly-bg: #eee;
+    }
+
+    /* Variables Modo Oscuro (Automático) */
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primary: #6AAB64; 
+        --primary-dark: #86efac;
+        --secondary: #374151; /* Gris oscuro para cabeceras */
+        --bg-color: #111827;  /* Fondo muy oscuro */
+        --white: #1f2937;     /* Fondo de tarjetas */
+        --border: #4b5563;
+        --danger: #f87171;
+        --text: #f9fafb;      /* Texto blanco */
+        --text-muted: #9ca3af;
+        --input-bg: #111827;  /* Inputs más oscuros */
+        --canto-color: #4ade80; /* Verde más brillante para resaltar */
+        --preview-box-bg: #4b5563; /* Tablero oscuro en visualizador */
+        --preview-box-border: #6b7280;
+        --legend-bg: #064e3b; /* Fondo verde oscuro leyenda */
+        --readonly-bg: #374151;
+      }
     }
 
     * {
@@ -34,7 +60,8 @@
     body {
       background-color: var(--bg-color);
       color: var(--text);
-      padding-bottom: 80px; /* Espacio para botones flotantes en móvil */
+      padding-bottom: 80px;
+      transition: background-color 0.3s, color 0.3s;
     }
 
     .container {
@@ -65,7 +92,7 @@
     }
     .brand p {
       font-size: 0.95rem;
-      color: #6b7280;
+      color: var(--text-muted);
       font-weight: 500;
     }
 
@@ -87,6 +114,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      color: var(--text);
     }
 
     .radio-label input {
@@ -115,7 +143,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      color: var(--secondary);
+      color: var(--text); /* Adaptado para modo oscuro */
     }
 
     .grid-form {
@@ -129,7 +157,7 @@
       font-size: 0.85rem;
       font-weight: 600;
       margin-bottom: 5px;
-      color: #4b5563;
+      color: var(--text-muted);
     }
 
     .form-group input {
@@ -138,6 +166,7 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       background: var(--input-bg);
+      color: var(--text);
       font-size: 1rem;
       transition: border-color 0.2s;
     }
@@ -145,7 +174,9 @@
     .form-group input:focus {
       outline: none;
       border-color: var(--primary);
-      background: white;
+      /* En modo oscuro, el fondo blanco al focus puede ser muy brillante, 
+         mantenemos input-bg o lo hacemos un poco más claro */
+      border-width: 2px;
     }
 
     /* --- BARRA DE ESTADISTICAS --- */
@@ -181,7 +212,7 @@
       border-spacing: 0;
     }
 
-    /* Estilos Desktop (por defecto) */
+    /* Estilos Desktop */
     .table-responsive thead th {
       background: var(--secondary);
       color: white;
@@ -200,13 +231,14 @@
     }
     
     .table-responsive tbody tr:hover {
-      background: #f8fafc;
+      background: var(--bg-color); /* Ligero contraste al hover */
     }
 
     .table-responsive td {
       padding: 10px;
       border-bottom: 1px solid var(--border);
       vertical-align: middle;
+      color: var(--text);
     }
 
     .table-responsive input, 
@@ -216,6 +248,8 @@
       border: 1px solid var(--border);
       border-radius: 4px;
       font-size: 0.95rem;
+      background: var(--input-bg);
+      color: var(--text);
     }
 
     /* --- PREVIEW VISUALIZADOR --- */
@@ -227,14 +261,13 @@
     .preview-box {
         width: 36px;
         height: 24px;
-        background-color: #e5e7eb; /* Color tablero base */
-        border: 1px solid #9ca3af;
+        background-color: var(--preview-box-bg);
+        border: 1px solid var(--preview-box-border);
         border-radius: 1px;
         flex-shrink: 0;
         position: relative;
         transition: all 0.2s;
     }
-    /* Bordes específicos para simular canteado */
     .preview-box.c-top { border-top: 3px solid var(--canto-color); }
     .preview-box.c-bottom { border-bottom: 3px solid var(--canto-color); }
     .preview-box.c-left { border-left: 3px solid var(--canto-color); }
@@ -253,9 +286,9 @@
       transition: background 0.2s;
     }
     .btn-delete { color: var(--danger); }
-    .btn-delete:hover { background: #fee2e2; }
-    .btn-copy { color: var(--secondary); }
-    .btn-copy:hover { background: #e2e8f0; }
+    .btn-delete:hover { background: rgba(239, 68, 68, 0.1); }
+    .btn-copy { color: var(--text); }
+    .btn-copy:hover { background: rgba(0,0,0,0.05); }
 
     /* --- MOBILE CARD VIEW --- */
     @media (max-width: 768px) {
@@ -286,7 +319,7 @@
         content: attr(data-label);
         font-weight: 700;
         font-size: 0.85rem;
-        color: #6b7280;
+        color: var(--text-muted);
         text-align: left;
         margin-right: 15px;
         flex: 1;
@@ -331,29 +364,10 @@
     .action-bar {
       margin-top: 20px;
       display: flex;
-      flex-direction: column;
+      flex-wrap: wrap;
       gap: 15px;
-    }
-
-    .main-actions {
-        display: flex;
-        gap: 10px;
-        justify-content: space-between;
-    }
-
-    .share-actions {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 10px;
-        padding-top: 15px;
-        border-top: 1px solid var(--border);
-    }
-
-    .fallback-links {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        margin-top: 10px;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .btn {
@@ -367,7 +381,7 @@
       justify-content: center;
       gap: 8px;
       transition: transform 0.1s, box-shadow 0.2s;
-      text-decoration: none; /* Para enlaces */
+      text-decoration: none;
       font-size: 0.95rem;
     }
     
@@ -382,36 +396,20 @@
     .btn-outline {
       background: transparent;
       border: 2px solid var(--secondary);
-      color: var(--secondary);
+      color: var(--secondary); /* En modo oscuro usará el gris/blanco */
+    }
+    @media (prefers-color-scheme: dark) {
+        .btn-outline {
+            border-color: var(--text);
+            color: var(--text);
+        }
     }
 
     .btn-danger {
-      background: #fee2e2;
-      color: var(--danger);
+      background: var(--danger); /* Usa la variable ajustada */
+      color: white; 
     }
     
-    .btn-share {
-        background-color: var(--share-color);
-        color: white;
-        box-shadow: 0 4px 6px rgba(99, 102, 241, 0.4);
-        width: 100%;
-        padding: 15px;
-        font-size: 1.1rem;
-    }
-
-    .btn-whatsapp {
-        background-color: #25D366;
-        color: white;
-        font-size: 0.85rem;
-        padding: 8px;
-    }
-    .btn-email {
-        background-color: #0078d4;
-        color: white;
-        font-size: 0.85rem;
-        padding: 8px;
-    }
-
     /* Leyenda Modal/Toggle */
     .legend-toggle {
       font-size: 0.85rem;
@@ -423,13 +421,20 @@
     }
     .legend-content {
       display: none;
-      background: #f0fdf4;
+      background: var(--legend-bg);
       padding: 10px;
       border-radius: 6px;
       margin-top: 5px;
       font-size: 0.8rem;
+      color: var(--text);
     }
     .legend-content.show { display: block; }
+    
+    /* Readonly inputs specific fix */
+    input[readonly] {
+        background: var(--readonly-bg) !important;
+        cursor: not-allowed;
+    }
 
   </style>
 </head>
@@ -478,7 +483,7 @@
         </div>
         <div class="form-group">
           <label>Fecha</label>
-          <input type="text" id="fecha" readonly style="background: #eee; cursor: not-allowed;">
+          <input type="text" id="fecha" readonly>
         </div>
       </div>
     </div>
@@ -492,7 +497,7 @@
             <span style="opacity: 0.3">|</span>
             <span id="totalArea">0.00 m²</span>
             <span style="opacity: 0.3">|</span>
-            <span id="totalCanto" style="color: #a3e635;">0.00 ml Canto</span>
+            <span id="totalCanto" style="color: var(--canto-color);">0.00 ml Canto</span>
         </div>
       </div>
     </div>
@@ -506,7 +511,7 @@
       <table class="table-responsive" id="dataTable">
         <thead>
           <tr>
-            <th width="15%">Canteado (Visual)</th>
+            <th width="15%">Canteado</th>
             <th width="20%">Referencia (Etiqueta)</th>
             <th width="22%">Material</th>
             <th width="8%">Grueso</th>
@@ -540,36 +545,12 @@
 
       <!-- BOTONES FINALES -->
       <div class="action-bar">
-        <!-- Acciones Principales -->
-        <div class="main-actions">
-             <button type="button" class="btn btn-danger" id="clearTableBtn" style="font-size: 0.9rem;">
-              <i data-lucide="trash-2"></i> Borrar Todo
-            </button>
-            <button type="button" class="btn btn-primary" id="downloadBtn" onclick="downloadExcelOnly()" style="flex:1;">
-              <i data-lucide="download"></i> Descargar Excel
-            </button>
-        </div>
-
-        <!-- Acciones Compartir -->
-        <div class="share-actions">
-            <!-- BOTÓN MÁGICO PARA MÓVIL -->
-            <button type="button" class="btn btn-share" onclick="shareNative()">
-                <i data-lucide="share-2"></i> Compartir Excel (App Móvil)
-            </button>
-            
-            <div style="text-align: center; margin: 10px 0; font-size: 0.8rem; color: #666;">
-                O usa los enlaces manuales (PC):
-            </div>
-
-            <div class="fallback-links">
-                <button type="button" class="btn btn-email" onclick="sendEmail()">
-                    <i data-lucide="mail"></i> Email (Link)
-                </button>
-                <button type="button" class="btn btn-whatsapp" onclick="sendWhatsApp()">
-                    <i data-lucide="message-circle"></i> WhatsApp (Link)
-                </button>
-            </div>
-        </div>
+        <button type="button" class="btn btn-danger" id="clearTableBtn" style="font-size: 0.9rem;">
+          <i data-lucide="trash-2"></i> Borrar Todo
+        </button>
+        <button type="button" class="btn btn-primary" id="downloadBtn" onclick="downloadExcel()" style="flex:1;">
+          <i data-lucide="download"></i> Generar y Descargar Excel
+        </button>
       </div>
     </form>
   </div>
@@ -844,16 +825,17 @@
         document.getElementById("legendBox").classList.toggle("show");
     }
 
-    // --- LÓGICA DE EXCEL Y COMPARTIR ---
+    // --- EXCEL GENERATION ---
 
-    // 1. Validar Datos
-    function validateForm() {
+    function downloadExcel() {
         const nombre = document.getElementById("nombre").value.trim();
+        const email = document.getElementById("email").value.trim();
         const telefono = document.getElementById("telefono").value.trim();
+        const codigo = document.getElementById("codigoCliente").value.trim();
         
         if (!nombre || !telefono) {
             alert("Por favor, indica al menos el Nombre y Teléfono.");
-            return false;
+            return;
         }
 
         // Verificar filas vacías
@@ -865,17 +847,9 @@
 
         if(!hasData) {
             alert("La tabla está vacía. Añade al menos una medida.");
-            return false;
+            return;
         }
-        return true;
-    }
 
-    // 2. Generar Datos Excel (Común para Descargar y Compartir)
-    function getExcelData() {
-        const nombre = document.getElementById("nombre").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const telefono = document.getElementById("telefono").value.trim();
-        const codigo = document.getElementById("codigoCliente").value.trim();
         const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
         const fecha = document.getElementById("fecha").value;
 
@@ -891,7 +865,6 @@
             ["Canteado", "Referencia", "Material", "Grueso", "Largo (mm)", "Ancho (mm)", "Unidades"]
         ];
 
-        const rows = tableBody.querySelectorAll("tr");
         rows.forEach(row => {
             const mat = row.querySelector(".input-mat").value;
             const lar = row.querySelector(".input-largo").value;
@@ -920,72 +893,8 @@
         const cleanName = nombre.replace(/[^a-z0-9]/gi, '_').toLowerCase();
         const fileName = `Gabarro_${tipo}_${cleanName}.xlsx`;
 
-        return { wb, fileName };
-    }
-
-    // 3. Descarga Normal (PC)
-    function downloadExcelOnly() {
-        if(!validateForm()) return;
-        const { wb, fileName } = getExcelData();
         XLSX.writeFile(wb, fileName);
     }
-
-    // 4. Compartir Nativo (Móvil - Adjunto Automático)
-    async function shareNative() {
-        if(!validateForm()) return;
-        
-        // Comprobar soporte
-        if (!navigator.canShare || !navigator.share) {
-            alert("Tu navegador no soporta compartir archivos nativamente. Por favor, usa los botones de abajo (Email/WhatsApp) y adjunta el archivo manualmente.");
-            return;
-        }
-
-        const { wb, fileName } = getExcelData();
-        
-        // Convertir Workbook a Blob
-        const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-        const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        
-        // Crear File Object
-        const file = new File([blob], fileName, { type: blob.type });
-
-        // Intentar compartir
-        if (navigator.canShare({ files: [file] })) {
-            try {
-                await navigator.share({
-                    title: 'Pedido Gabarró',
-                    text: `Adjunto pedido de ${document.getElementById("nombre").value}`,
-                    files: [file]
-                });
-            } catch (err) {
-                console.error("Error compartiendo:", err);
-            }
-        } else {
-            alert("Tu dispositivo no permite compartir este tipo de archivo automáticamente.");
-        }
-    }
-
-    // 5. Fallback Manuales
-    function getSummaryText() {
-        const nombre = document.getElementById("nombre").value || "Cliente";
-        const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
-        const totalP = document.getElementById("totalPieces").textContent;
-        return `Hola, soy ${nombre}. Envío Excel para ${tipo}. Resumen: ${totalP}.`;
-    }
-
-    window.sendEmail = function() {
-        const subject = `Nuevo Pedido Gabarró - ${document.getElementById("nombre").value}`;
-        const body = getSummaryText();
-        alert("Se abrirá tu correo. RECUERDA: Debes adjuntar el archivo manualmente.");
-        window.location.href = `mailto:marcos.sanchez@gabarro.com?subject=${subject}&body=${body}`;
-    };
-
-    window.sendWhatsApp = function() {
-        const phone = "34669228010";
-        const text = getSummaryText();
-        alert("Se abrirá WhatsApp. RECUERDA: Debes adjuntar el archivo manualmente.");
-        window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
-    };
 
   </script>
 </body>
