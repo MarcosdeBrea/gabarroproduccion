@@ -20,6 +20,7 @@
       --danger: #ef4444;
       --text: #1f2937;
       --input-bg: #f9fafb;
+      --canto-color: #22c55e; /* Color verde brillante para el canto */
     }
 
     * {
@@ -146,7 +147,7 @@
       background: white;
     }
 
-    /* --- BARRA DE ESTADISTICAS (Modificada) --- */
+    /* --- BARRA DE ESTADISTICAS --- */
     .stats-container {
       margin-bottom: 15px;
     }
@@ -204,6 +205,7 @@
     .table-responsive td {
       padding: 10px;
       border-bottom: 1px solid var(--border);
+      vertical-align: middle;
     }
 
     .table-responsive input, 
@@ -214,6 +216,29 @@
       border-radius: 4px;
       font-size: 0.95rem;
     }
+
+    /* --- PREVIEW VISUALIZADOR --- */
+    .canto-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .preview-box {
+        width: 36px;
+        height: 24px;
+        background-color: #e5e7eb; /* Color tablero base */
+        border: 1px solid #9ca3af;
+        border-radius: 1px;
+        flex-shrink: 0;
+        position: relative;
+        transition: all 0.2s;
+    }
+    /* Bordes específicos para simular canteado */
+    .preview-box.c-top { border-top: 3px solid var(--canto-color); }
+    .preview-box.c-bottom { border-bottom: 3px solid var(--canto-color); }
+    .preview-box.c-left { border-left: 3px solid var(--canto-color); }
+    .preview-box.c-right { border-right: 3px solid var(--canto-color); }
+
 
     .btn-icon {
       background: none;
@@ -268,7 +293,14 @@
 
       .table-responsive td input,
       .table-responsive td select {
-        width: 60%; /* Input takes 60% on mobile row */
+        width: 60%; 
+      }
+      
+      .canto-wrapper {
+          width: 60%;
+      }
+      .canto-wrapper select {
+          width: 100%;
       }
 
       .table-responsive td:last-child {
@@ -283,7 +315,6 @@
         display: none;
       }
 
-      /* Ajustes barra stats móvil */
       .stats-bar {
         flex-direction: column;
         align-items: flex-start;
@@ -299,10 +330,22 @@
     .action-bar {
       margin-top: 20px;
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 15px;
-      justify-content: space-between;
-      align-items: center;
+    }
+
+    .main-actions {
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+    }
+
+    .share-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        padding-top: 15px;
+        border-top: 1px solid var(--border);
     }
 
     .btn {
@@ -313,8 +356,11 @@
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       transition: transform 0.1s, box-shadow 0.2s;
+      text-decoration: none; /* Para enlaces */
+      font-size: 0.95rem;
     }
     
     .btn:active { transform: scale(0.98); }
@@ -334,6 +380,15 @@
     .btn-danger {
       background: #fee2e2;
       color: var(--danger);
+    }
+    
+    .btn-whatsapp {
+        background-color: #25D366;
+        color: white;
+    }
+    .btn-email {
+        background-color: #0078d4;
+        color: white;
     }
 
     /* Leyenda Modal/Toggle */
@@ -430,9 +485,9 @@
       <table class="table-responsive" id="dataTable">
         <thead>
           <tr>
-            <th width="12%">Canteado</th>
+            <th width="15%">Canteado (Visual)</th>
             <th width="20%">Referencia (Etiqueta)</th>
-            <th width="25%">Material</th>
+            <th width="22%">Material</th>
             <th width="8%">Grueso</th>
             <th width="10%">Largo (mm)</th>
             <th width="10%">Ancho (mm)</th>
@@ -454,7 +509,7 @@
       <div style="margin-top: 15px; text-align: right;">
         <span class="legend-toggle" onclick="toggleLegend()">¿Qué significan los códigos de canto?</span>
         <div id="legendBox" class="legend-content" style="text-align: left;">
-          <strong>Leyenda:</strong> CL = Canto Largo, CA = Canto Ancho.<br>
+          <strong>Leyenda:</strong> CL = Canto Largo (Arriba/Abajo en dibujo), CA = Canto Ancho (Izq/Der en dibujo).<br>
           • <strong>1CL 1CA:</strong> Una "L" (1 Largo + 1 Ancho)<br>
           • <strong>2CL:</strong> Los dos lados largos paralelos<br>
           • <strong>4C:</strong> Todo el perímetro<br>
@@ -464,12 +519,28 @@
 
       <!-- BOTONES FINALES -->
       <div class="action-bar">
-        <button type="button" class="btn btn-danger" id="clearTableBtn" style="font-size: 0.9rem;">
-          <i data-lucide="trash-2"></i> Borrar Todo
-        </button>
-        <button type="button" class="btn btn-primary" id="submitBtn" style="flex:1; justify-content: center; font-size: 1.1rem;">
-          <i data-lucide="download"></i> Generar Excel
-        </button>
+        <!-- Acciones Principales -->
+        <div class="main-actions">
+             <button type="button" class="btn btn-danger" id="clearTableBtn" style="font-size: 0.9rem;">
+              <i data-lucide="trash-2"></i> Borrar Todo
+            </button>
+            <button type="button" class="btn btn-primary" id="submitBtn" style="flex:1;">
+              <i data-lucide="download"></i> 1. Generar Excel
+            </button>
+        </div>
+
+        <!-- Acciones Compartir -->
+         <div style="text-align: center; font-size: 0.8rem; color: #666; margin-bottom: -5px;">
+            Descarga el Excel primero y luego envíalo:
+         </div>
+        <div class="share-actions">
+            <button type="button" class="btn btn-email" onclick="sendEmail()">
+                <i data-lucide="mail"></i> 2. Enviar Email
+            </button>
+            <button type="button" class="btn btn-whatsapp" onclick="sendWhatsApp()">
+                <i data-lucide="message-circle"></i> 2. Enviar WhatsApp
+            </button>
+        </div>
       </div>
     </form>
   </div>
@@ -524,7 +595,10 @@
 
         row.innerHTML = `
           <td data-label="Canteado">
-            <select class="input-canto" onchange="saveData(); updateStats()">${optionsHTML}</select>
+            <div class="canto-wrapper">
+                <select class="input-canto" onchange="handleCantoChange(this)">${optionsHTML}</select>
+                <div class="preview-box" title="Visualizador de cantos"></div>
+            </div>
           </td>
           <td data-label="Referencia">
             <input type="text" class="input-ref" value="${data.referencia || ''}" placeholder="Ej. Puerta izq" oninput="saveData()">
@@ -555,20 +629,64 @@
             </div>
           </td>
         `;
+        
+        // Inicializar el preview visual inmediatamente después de crear
+        setTimeout(() => {
+            const select = row.querySelector('.input-canto');
+            updatePreviewBox(select);
+        }, 0);
+
         return row;
+    }
+    
+    // Función para manejar el cambio en el select y actualizar todo
+    window.handleCantoChange = function(selectElement) {
+        updatePreviewBox(selectElement);
+        saveData();
+        updateStats();
+    }
+
+    // Función que pinta los bordes del recuadro
+    function updatePreviewBox(selectElement) {
+        const val = selectElement.value;
+        const box = selectElement.nextElementSibling; // El div .preview-box
+        
+        // Resetear clases
+        box.className = 'preview-box';
+        
+        // Lógica de mapeo: 
+        // Largo (L) = Arriba y Abajo (Horizontal)
+        // Ancho (A) = Izquierda y Derecha (Vertical)
+        
+        if (val.includes("4C")) {
+            box.classList.add("c-top", "c-bottom", "c-left", "c-right");
+        } else if (val === "SIN CANTO") {
+            // nada
+        } else {
+            // Lógica combinatoria
+            // Revisar Largos (L)
+            if (val.includes("2CL")) {
+                box.classList.add("c-top", "c-bottom");
+            } else if (val.includes("1CL")) {
+                box.classList.add("c-top"); // Por convención visual
+            }
+            
+            // Revisar Anchos (A o CA)
+            // Cuidado: "1CL 1CA" contiene "1CA", pero "1CA" solo también.
+            if (val.includes("2CA")) {
+                box.classList.add("c-left", "c-right");
+            } else if (val.includes("1CA")) {
+                box.classList.add("c-right"); // Por convención visual
+            }
+        }
     }
 
     function addNewRow(data = {}) {
-      // LOGICA DE AUTO-COPIADO:
-      // Si "data" está vacío (es una fila nueva manual) y existe una fila anterior...
       if (Object.keys(data).length === 0) {
         const lastRow = tableBody.lastElementChild;
         if (lastRow) {
-            // ...cogemos los valores de la fila anterior
             const lastMat = lastRow.querySelector(".input-mat").value;
             const lastGrueso = lastRow.querySelector(".input-grueso").value;
-            
-            // Y pre-llenamos los datos de la nueva fila
             if (lastMat) data.material = lastMat;
             if (lastGrueso) data.grueso = lastGrueso;
         }
@@ -576,7 +694,7 @@
 
       const row = createRowHTML(data);
       tableBody.appendChild(row);
-      lucide.createIcons(); // Recargar iconos para los nuevos botones
+      lucide.createIcons();
       updateStats();
       saveData();
     }
@@ -618,7 +736,7 @@
     function updateStats() {
       let totalP = 0;
       let totalM2 = 0;
-      let totalML = 0; // Total metros lineales de canto
+      let totalML = 0;
 
       const rows = tableBody.querySelectorAll("tr");
       rows.forEach(row => {
@@ -627,15 +745,12 @@
         const anchoMm = parseFloat(row.querySelector(".input-ancho").value) || 0;
         const cantoType = row.querySelector(".input-canto").value;
 
-        // Convertir a metros para cálculos
         const largoM = largoMm / 1000;
         const anchoM = anchoMm / 1000;
 
         totalP += uds;
-        // Calculo mm a metros cuadrados: (L * A / 1,000,000) * Uds
         totalM2 += (largoM * anchoM) * uds;
 
-        // Cálculo de Metros Lineales de Canto según selección
         let mlPerPiece = 0;
         switch(cantoType) {
             case "1CL 1CA": mlPerPiece = largoM + anchoM; break;
@@ -646,7 +761,7 @@
             case "4C":      mlPerPiece = (largoM * 2) + (anchoM * 2); break;
             case "1CA":     mlPerPiece = anchoM; break;
             case "2CA":     mlPerPiece = anchoM * 2; break;
-            default:        mlPerPiece = 0; // SIN CANTO o vacío
+            default:        mlPerPiece = 0;
         }
         totalML += mlPerPiece * uds;
       });
@@ -658,7 +773,7 @@
       }
     }
 
-    // --- LOCAL STORAGE (AUTOGUARDADO) ---
+    // --- LOCAL STORAGE ---
     window.saveData = function() {
         const formData = {
             nombre: document.getElementById("nombre").value,
@@ -701,7 +816,7 @@
                 }
 
                 if(data.items && data.items.length > 0) {
-                    tableBody.innerHTML = ""; // Limpiar tabla por defecto
+                    tableBody.innerHTML = ""; 
                     data.items.forEach(item => addNewRow(item));
                 }
             } catch(e) {
@@ -710,10 +825,36 @@
         }
     }
 
-    // --- LEYENDA TOGGLE ---
     window.toggleLegend = function() {
         document.getElementById("legendBox").classList.toggle("show");
     }
+
+    // --- FUNCIONES DE ENVÍO ---
+
+    function getSummaryText() {
+        const nombre = document.getElementById("nombre").value || "Cliente Desconocido";
+        const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
+        const totalP = document.getElementById("totalPieces").textContent;
+        const totalM = document.getElementById("totalArea").textContent;
+        const totalC = document.getElementById("totalCanto").textContent;
+        
+        return `Hola, soy ${nombre}. Adjunto el Excel para ${tipo}.%0A%0AResumen:%0A- ${totalP}%0A- ${totalM}%0A- ${totalC}%0A%0APor favor, confirmad recepción.`;
+    }
+
+    window.sendEmail = function() {
+        const subject = `Nuevo Pedido Gabarró - ${document.getElementById("nombre").value}`;
+        const body = getSummaryText().replace(/%0A/g, "%0D%0A"); // Salto de línea email
+        // Nota: NO se puede adjuntar archivo via mailto, el usuario debe hacerlo
+        alert("Se abrirá tu correo. RECUERDA: Debes adjuntar manualmente el archivo Excel descargado.");
+        window.location.href = `mailto:marcos.sanchez@gabarro.com?subject=${subject}&body=${body}`;
+    };
+
+    window.sendWhatsApp = function() {
+        const phone = "34669228010";
+        const text = getSummaryText();
+        alert("Se abrirá WhatsApp. RECUERDA: Debes arrastrar/adjuntar el archivo Excel al chat.");
+        window.open(`https://wa.me/${phone}?text=${text}`, '_blank');
+    };
 
     // --- EXCEL GENERATION ---
     document.getElementById("submitBtn").addEventListener("click", function () {
@@ -722,7 +863,6 @@
         const telefono = document.getElementById("telefono").value.trim();
         const codigo = document.getElementById("codigoCliente").value.trim();
         
-        // Validación básica
         if (!nombre || !telefono) {
             alert("Por favor, indica al menos el Nombre y Teléfono.");
             return;
@@ -731,7 +871,6 @@
         const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
         const fecha = document.getElementById("fecha").value;
 
-        // Estructura de datos para Excel
         const dataRows = [
             ["FORMULARIO DE PRODUCCIÓN", ""],
             ["Tipo Solicitud:", tipo],
@@ -740,11 +879,10 @@
             ["Email:", email],
             ["Teléfono:", telefono],
             ["Cód. Cliente:", codigo],
-            [], // Espacio
-            ["Canteado", "Referencia", "Material", "Grueso", "Largo (mm)", "Ancho (mm)", "Unidades"] // Cabecera Tabla
+            [],
+            ["Canteado", "Referencia", "Material", "Grueso", "Largo (mm)", "Ancho (mm)", "Unidades"]
         ];
 
-        // Obtener datos de la tabla HTML
         const rows = tableBody.querySelectorAll("tr");
         let hasData = false;
 
@@ -754,7 +892,6 @@
             const anc = row.querySelector(".input-ancho").value;
             const uds = row.querySelector(".input-uds").value;
 
-            // Solo añadir si hay datos mínimos
             if(mat || (lar && anc)) {
                 hasData = true;
                 dataRows.push([
@@ -774,27 +911,22 @@
             return;
         }
 
-        // Generar Libro
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(dataRows);
         
-        // Ajustar anchos de columna (Visualización Excel)
         ws['!cols'] = [
-            { wch: 15 }, // Canteado
-            { wch: 25 }, // Ref
-            { wch: 30 }, // Material
-            { wch: 8 },  // Grueso
-            { wch: 10 }, // Largo
-            { wch: 10 }, // Ancho
-            { wch: 8 }   // Uds
+            { wch: 15 }, 
+            { wch: 25 }, 
+            { wch: 30 }, 
+            { wch: 8 }, 
+            { wch: 10 }, 
+            { wch: 10 }, 
+            { wch: 8 } 
         ];
 
         XLSX.utils.book_append_sheet(wb, ws, "Produccion");
-
-        // Nombre archivo limpio
         const cleanName = nombre.replace(/[^a-z0-9]/gi, '_').toLowerCase();
         const fileName = `Gabarro_${tipo}_${cleanName}.xlsx`;
-
         XLSX.writeFile(wb, fileName);
     });
 
