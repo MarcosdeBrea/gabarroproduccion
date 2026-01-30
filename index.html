@@ -559,6 +559,21 @@
     }
 
     function addNewRow(data = {}) {
+      // LOGICA DE AUTO-COPIADO:
+      // Si "data" está vacío (es una fila nueva manual) y existe una fila anterior...
+      if (Object.keys(data).length === 0) {
+        const lastRow = tableBody.lastElementChild;
+        if (lastRow) {
+            // ...cogemos los valores de la fila anterior
+            const lastMat = lastRow.querySelector(".input-mat").value;
+            const lastGrueso = lastRow.querySelector(".input-grueso").value;
+            
+            // Y pre-llenamos los datos de la nueva fila
+            if (lastMat) data.material = lastMat;
+            if (lastGrueso) data.grueso = lastGrueso;
+        }
+      }
+
       const row = createRowHTML(data);
       tableBody.appendChild(row);
       lucide.createIcons(); // Recargar iconos para los nuevos botones
