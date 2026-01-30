@@ -2,603 +2,787 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Plantilla producción</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Plantilla Producción Gabarró</title>
+  <!-- Librería para Excel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Iconos (Lucide) para un look más moderno -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
   <style>
     :root {
-      --primary-color: #6AAB64;
-      --secondary-color: #557C52;
-      --text-color: #333;
-      --light-bg: #f8f9fa;
-      --border-color: #ddd;
-      --header-bg: #D1E7CB;
-      --red-text: #CC0000;
+      --primary: #6AAB64;
+      --primary-dark: #4e8549;
+      --secondary: #2c3e50;
+      --bg-color: #f3f4f6;
+      --white: #ffffff;
+      --border: #e5e7eb;
+      --danger: #ef4444;
+      --text: #1f2937;
+      --input-bg: #f9fafb;
     }
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
+
     body {
-      background-color: var(--light-bg);
-      color: var(--text-color);
-      padding: 5px;
+      background-color: var(--bg-color);
+      color: var(--text);
+      padding-bottom: 80px; /* Espacio para botones flotantes en móvil */
     }
+
     .container {
-      width: 98%;
+      max-width: 1200px;
       margin: 0 auto;
-      background-color: white;
-      padding: 5px;
-      border-radius: 5px;
+      padding: 20px;
     }
-    /* Cabecera */
+
+    /* --- CABECERA --- */
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
-    }
-    .title-container {
-      display: flex;
-      align-items: center;
-    }
-    .main-title {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: var(--primary-color);
-    }
-    .logo-container {
-      text-align: right;
-    }
-    .logo-text {
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: var(--text-color);
-      margin-bottom: 5px;
-    }
-    .website {
-      color: var(--secondary-color);
-    }
-    /* Radios */
-    .radios {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+      background: var(--white);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
-      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
     }
-    .radios label {
-      display: inline-flex;
-      align-items: center;
-      font-weight: bold;
+
+    .brand h1 {
+      font-size: 1.5rem;
+      color: var(--primary);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .brand p {
+      font-size: 0.95rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .order-type {
+      display: flex;
+      gap: 10px;
+      background: var(--bg-color);
+      padding: 5px;
+      border-radius: 8px;
+    }
+
+    .radio-label {
+      padding: 8px 16px;
+      border-radius: 6px;
       cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .radios input[type="radio"] {
-      margin-right: 5px;
+
+    .radio-label input {
+      display: none;
     }
-    .important-note {
-      text-align: center;
-      margin: 15px 0;
-      font-weight: bold;
-      color: var(--red-text);
+
+    .radio-label:has(input:checked) {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 4px rgba(106, 171, 100, 0.3);
     }
-    /* Nota actualizada */
-    .important-note::before {
-      content: "El sentido de la veta es siempre el LARGO (la primera medida), todas las medidas en MM.";
+
+    /* --- FORMULARIO CLIENTE --- */
+    .card {
+      background: var(--white);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
     }
-    /* Formulario */
-    .form-header {
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--secondary);
+    }
+
+    .grid-form {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 15px;
-      margin-bottom: 20px;
-      padding: 15px;
-      background-color: var(--light-bg);
-      border-radius: 5px;
     }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    .required-field::after {
-      content: "*";
-      color: var(--red-text);
-      margin-left: 4px;
-    }
-    label {
+
+    .form-group label {
       display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
       margin-bottom: 5px;
-      font-weight: bold;
+      color: #4b5563;
     }
-    input,
-    select {
+
+    .form-group input {
       width: 100%;
       padding: 10px;
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      font-size: 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--input-bg);
+      font-size: 1rem;
+      transition: border-color 0.2s;
     }
-    /* Tabla */
-    .table-container {
-      overflow-x: auto;
-      margin-bottom: 20px;
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
+
+    /* --- BARRA DE ESTADISTICAS (Modificada) --- */
+    .stats-container {
+      margin-bottom: 15px;
     }
-    th,
-    td {
-      border: 1px solid var(--border-color);
-      padding: 12px;
-      text-align: center;
-      vertical-align: middle;
-    }
-    th {
-      background-color: var(--header-bg);
-      color: var(--text-color);
-      font-weight: bold;
-    }
-    /* Anchos de columnas */
-    th.canteado { width: 10%; }
-    th.referencia { width: 24%; }
-    th.material { width: 29%; }
-    th.grueso { width: 7%; }
-    th.largo,
-    th.ancho { width: 8%; }
-    th.unidades { width: 8%; }
-    th.delete-col { width: 4%; }
-    tr:nth-child(even) {
-      background-color: var(--light-bg);
-    }
-    /* Botón para eliminar filas */
-    .delete-row-btn {
-      background: none;
-      border: none;
-      font-size: 16px;
-      font-weight: bold;
-      color: var(--red-text);
-      cursor: pointer;
-    }
-    /* Botones principales */
-    .buttons-wrapper {
+
+    .stats-bar {
+      background: var(--secondary);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
-    }
-    .buttons-row {
-      display: flex;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      flex-wrap: wrap;
       gap: 10px;
     }
-    .add-row,
-    .clear-table,
-    .submit-btn {
-      background-color: var(--primary-color);
+
+    .stats-values {
+      display: flex;
+      gap: 15px;
+      font-weight: bold;
+      flex-wrap: wrap;
+    }
+
+    /* --- TABLA RESPONSIVE --- */
+    .table-responsive {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+
+    /* Estilos Desktop (por defecto) */
+    .table-responsive thead th {
+      background: var(--secondary);
       color: white;
+      padding: 12px;
+      text-align: left;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .table-responsive thead th:first-child { border-top-left-radius: 8px; }
+    .table-responsive thead th:last-child { border-top-right-radius: 8px; }
+
+    .table-responsive tbody tr {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      transition: background 0.2s;
+    }
+    
+    .table-responsive tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .table-responsive td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table-responsive input, 
+    .table-responsive select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.95rem;
+    }
+
+    .btn-icon {
+      background: none;
       border: none;
-      padding: 12px 20px;
-      border-radius: 4px;
       cursor: pointer;
-      font-size: 16px;
-      transition: background-color 0.3s;
-    }
-    .add-row:hover,
-    .clear-table:hover,
-    .submit-btn:hover {
-      background-color: var(--secondary-color);
-    }
-    /* Leyenda centrada debajo de los botones */
-    .leyenda {
-      display: block;
-      margin: 20px auto 0;
-      text-align: center;
-      background-color: #f9f9f9;
-      border: 1px solid var(--border-color);
-      padding: 15px;
+      padding: 5px;
       border-radius: 4px;
-      max-width: 600px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
     }
-    .leyenda h3 {
-      margin-bottom: 10px;
-      color: var(--primary-color);
-    }
-    .leyenda ul {
-      list-style-type: none;
-      padding-left: 0;
-    }
-    .leyenda li {
-      margin-bottom: 5px;
-      font-size: 8px;
-    }
-    .small-text {
-      font-size: 12px;
-      font-style: italic;
-      color: #666;
-    }
-    /* Responsivo */
+    .btn-delete { color: var(--danger); }
+    .btn-delete:hover { background: #fee2e2; }
+    .btn-copy { color: var(--secondary); }
+    .btn-copy:hover { background: #e2e8f0; }
+
+    /* --- MOBILE CARD VIEW --- */
     @media (max-width: 768px) {
-      .container {
-        width: 98%;
-        padding: 5px;
+      .table-responsive thead {
+        display: none;
       }
-      .header {
+      
+      .table-responsive tbody tr {
+        display: block;
+        background: var(--white);
+        margin-bottom: 15px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        padding: 15px;
+        border: 1px solid var(--border);
+      }
+
+      .table-responsive td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: none;
+        padding: 8px 0;
+        text-align: right;
+      }
+
+      .table-responsive td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #6b7280;
+        text-align: left;
+        margin-right: 15px;
+        flex: 1;
+      }
+
+      .table-responsive td input,
+      .table-responsive td select {
+        width: 60%; /* Input takes 60% on mobile row */
+      }
+
+      .table-responsive td:last-child {
+        border-top: 1px solid var(--border);
+        padding-top: 10px;
+        margin-top: 5px;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+      
+      .table-responsive td:last-child::before {
+        display: none;
+      }
+
+      /* Ajustes barra stats móvil */
+      .stats-bar {
         flex-direction: column;
-        gap: 10px;
+        align-items: flex-start;
       }
-      .title-container,
-      .logo-container {
+      .stats-values {
         width: 100%;
-        text-align: center;
-      }
-      .main-title {
-        font-size: 1.3rem;
-      }
-      .logo-text {
-        font-size: 1.5rem;
-      }
-      .form-header {
-        grid-template-columns: 1fr;
-      }
-      .radios {
-        gap: 8px;
-      }
-      th, td {
-        padding: 8px;
-        font-size: 14px;
-      }
-      th .small-text {
-        font-size: 10px;
-      }
-      td input, td select {
-        padding: 8px;
-        font-size: 14px;
-      }
-      /* En móviles, organizar los 3 botones en 2 filas:
-         Los dos primeros en la fila superior y el tercero en la inferior ocupando el ancho completo */
-      .buttons-row {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 10px;
-        width: 100%;
-      }
-      .buttons-row button:nth-child(3) {
-        grid-column: span 2;
-      }
-      .leyenda {
-        width: 100%;
-      }
-      .table-container table {
-        min-width: 800px;
+        justify-content: space-between;
+        font-size: 0.9rem;
       }
     }
-    @media (max-width: 480px) {
-      body {
-        padding: 5px;
-      }
-      .container {
-        padding: 5px;
-      }
-      .main-title {
-        font-size: 1.2rem;
-      }
-      .logo-text {
-        font-size: 1.4rem;
-      }
-      th, td {
-        padding: 6px;
-        font-size: 12px;
-      }
-      td input, td select {
-        padding: 6px;
-        font-size: 12px;
-      }
+
+    /* --- BOTONES DE ACCIÓN --- */
+    .action-bar {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: space-between;
+      align-items: center;
     }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    
+    .btn:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px rgba(106, 171, 100, 0.4);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--secondary);
+      color: var(--secondary);
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    /* Leyenda Modal/Toggle */
+    .legend-toggle {
+      font-size: 0.85rem;
+      color: var(--primary);
+      cursor: pointer;
+      text-decoration: underline;
+      margin-top: 10px;
+      display: inline-block;
+    }
+    .legend-content {
+      display: none;
+      background: #f0fdf4;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 5px;
+      font-size: 0.8rem;
+    }
+    .legend-content.show { display: block; }
+
   </style>
 </head>
 <body>
+
   <div class="container">
-    <!-- Cabecera -->
-    <div class="header">
-      <div class="title-container">
-        <h1 class="main-title">Plantilla producción</h1>
+    
+    <!-- CABECERA -->
+    <header class="header">
+      <div class="brand">
+        <h1>GABARRÓ</h1>
+        <p>Centro de Corte y Canteado</p>
       </div>
-      <div class="logo-container">
-        <div class="logo-text">GABARRÓ</div>
-        <div class="website">www.gabarro.com</div>
+      
+      <div class="order-type">
+        <label class="radio-label">
+          <input type="radio" name="tipoPedido" value="Pedido" checked onchange="saveData()">
+          <i data-lucide="shopping-cart"></i> Pedido
+        </label>
+        <label class="radio-label">
+          <input type="radio" name="tipoPedido" value="Presupuesto" onchange="saveData()">
+          <i data-lucide="file-text"></i> Presupuesto
+        </label>
+      </div>
+    </header>
+
+    <!-- FORMULARIO DATOS -->
+    <div class="card">
+      <div class="section-title"><i data-lucide="user"></i> Datos del Cliente</div>
+      <div class="grid-form">
+        <div class="form-group">
+          <label>Nombre *</label>
+          <input type="text" id="nombre" placeholder="Nombre completo o Empresa" oninput="saveData()">
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="email" placeholder="cliente@email.com" oninput="saveData()">
+        </div>
+        <div class="form-group">
+          <label>Teléfono *</label>
+          <input type="tel" id="telefono" placeholder="600 000 000" oninput="saveData()">
+        </div>
+        <div class="form-group">
+          <label>Código Cliente (Opcional)</label>
+          <input type="text" id="codigoCliente" oninput="saveData()">
+        </div>
+        <div class="form-group">
+          <label>Fecha</label>
+          <input type="text" id="fecha" readonly style="background: #eee; cursor: not-allowed;">
+        </div>
       </div>
     </div>
-    <!-- Radios -->
-    <div class="radios">
-      <label>
-        <input type="radio" name="tipoPedido" value="Pedido" checked />
-        Pedido
-      </label>
-      <label>
-        <input type="radio" name="tipoPedido" value="Solicitud de presupuesto" />
-        Presupuesto
-      </label>
+
+    <!-- RESUMEN DE PIEZAS -->
+    <div class="stats-container">
+      <div class="stats-bar">
+        <span><i data-lucide="calculator" style="margin-right: 8px; vertical-align: middle;"></i> Resumen Total</span>
+        <div class="stats-values">
+            <span id="totalPieces">0 Piezas</span>
+            <span style="opacity: 0.3">|</span>
+            <span id="totalArea">0.00 m²</span>
+            <span style="opacity: 0.3">|</span>
+            <span id="totalCanto" style="color: #a3e635;">0.00 ml Canto</span>
+        </div>
+      </div>
     </div>
+
+    <!-- TABLA DE MEDIDAS -->
     <form id="corteForm">
-      <!-- Datos del cliente -->
-      <div class="form-header">
-        <div class="form-group">
-          <label for="nombre" class="required-field">Nombre:</label>
-          <input type="text" id="nombre" name="nombre" required />
-        </div>
-        <div class="form-group">
-          <label for="email" class="required-field">Email:</label>
-          <input type="email" id="email" name="email" required />
-        </div>
-        <div class="form-group">
-          <label for="codigoCliente">Código Cliente:</label>
-          <input type="text" id="codigoCliente" name="codigoCliente" />
-        </div>
-        <div class="form-group">
-          <label for="telefono" class="required-field">Teléfono:</label>
-          <input type="tel" id="telefono" name="telefono" required />
-        </div>
-        <div class="form-group">
-          <label for="fecha">Fecha:</label>
-          <input type="text" id="fecha" name="fecha" readonly />
+      <div style="text-align: center; color: var(--danger); font-weight: bold; margin-bottom: 10px; font-size: 0.9rem;">
+        ⚠ IMPORTANTE: El LARGO es siempre la dirección de la veta
+      </div>
+
+      <table class="table-responsive" id="dataTable">
+        <thead>
+          <tr>
+            <th width="12%">Canteado</th>
+            <th width="20%">Referencia (Etiqueta)</th>
+            <th width="25%">Material</th>
+            <th width="8%">Grueso</th>
+            <th width="10%">Largo (mm)</th>
+            <th width="10%">Ancho (mm)</th>
+            <th width="8%">Uds.</th>
+            <th width="7%">Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Las filas se generan con JS -->
+        </tbody>
+      </table>
+
+      <!-- BOTÓN AGREGAR (GRANDE) -->
+      <button type="button" class="btn btn-outline" id="addRow" style="width: 100%; margin-top: 15px; border-style: dashed; justify-content: center;">
+        <i data-lucide="plus-circle"></i> Añadir Pieza
+      </button>
+
+      <!-- LEYENDA CANTEADO -->
+      <div style="margin-top: 15px; text-align: right;">
+        <span class="legend-toggle" onclick="toggleLegend()">¿Qué significan los códigos de canto?</span>
+        <div id="legendBox" class="legend-content" style="text-align: left;">
+          <strong>Leyenda:</strong> CL = Canto Largo, CA = Canto Ancho.<br>
+          • <strong>1CL 1CA:</strong> Una "L" (1 Largo + 1 Ancho)<br>
+          • <strong>2CL:</strong> Los dos lados largos paralelos<br>
+          • <strong>4C:</strong> Todo el perímetro<br>
+          • <strong>SIN CANTO:</strong> Corte crudo
         </div>
       </div>
-      <!-- Nota importante -->
-      <div class="important-note"></div>
-      <!-- Tabla -->
-      <div class="table-container">
-        <table id="dataTable">
-          <thead>
-            <tr>
-              <th class="canteado">
-                Canteado<br /><span class="small-text">Seleccionar lados a cantear</span>
-              </th>
-              <th class="referencia">
-                (Ref., pieza, zona...etc)<br /><span class="small-text">En etiqueta (opcional)</span>
-              </th>
-              <th class="material">Material</th>
-              <th class="grueso">Grueso</th>
-              <th class="largo">
-                Largo<br /><span class="small-text">Sentido veta (MM)</span>
-              </th>
-              <th class="ancho">
-                Ancho<br /><span class="small-text">(MM)</span>
-              </th>
-              <th class="unidades">
-                Unidades<br /><span class="small-text">Cantidad</span>
-              </th>
-              <th class="delete-col"></th>
-            </tr>
-          </thead>
-          <tbody id="tableBody">
-            <tr>
-              <td>
-                <select name="canteado[]">
-                  <option value="">-</option>
-                  <option value="SIN CANTO">SIN CANTO</option>
-                  <option value="1CL 1CA">1CL 1CA</option>
-                  <option value="1CL 2CA">1CL 2CA</option>
-                  <option value="2CL">2CL</option>
-                  <option value="2CL 1CA">2CL 1CA</option>
-                  <option value="1CL">1CL</option>
-                  <option value="4C">4C</option>
-                  <option value="1CA">1CA</option>
-                  <option value="2CA">2CA</option>
-                </select>
-              </td>
-              <td><input type="text" name="referencia[]" /></td>
-              <td><input type="text" name="material[]" /></td>
-              <td><input type="number" name="grueso[]" min="0" max="9999" /></td>
-              <td><input type="number" name="largo[]" min="0" max="9999" /></td>
-              <td><input type="number" name="ancho[]" min="0" max="9999" /></td>
-              <td><input type="number" name="unidades[]" min="1" max="9999" value="1" /></td>
-              <td><button type="button" class="delete-row-btn">-</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <!-- Botones y Leyenda -->
-      <div class="buttons-wrapper">
-        <div class="buttons-row">
-          <button type="button" class="add-row" id="addRow">Añadir Fila</button>
-          <button type="button" class="clear-table" id="clearTableBtn">Limpiar Tabla</button>
-          <button type="button" class="submit-btn" id="submitBtn">Descargar</button>
-        </div>
-        <div class="leyenda">
-          <h3>Leyenda canteado</h3>
-          <ul>
-            <li>1CL 1CA = 1 CANTO LARGO 1 CANTO ANCHO</li>
-            <li>1CL 2CA = 1 CANTO LARGO 2 CANTOS ANCHOS</li>
-            <li>2CL = 2 CANTOS LARGOS</li>
-            <li>2CL 1CA = 2 CANTOS LARGOS 1 CANTO ANCHO</li>
-            <li>1CL = 1 CANTO LARGO</li>
-            <li>4CL = 4 CANTOS LARGOS</li>
-            <li>1CA = 1 CANTO ANCHO</li>
-            <li>2CA = 2 CANTOS ANCHOS</li>
-          </ul>
-        </div>
+
+      <!-- BOTONES FINALES -->
+      <div class="action-bar">
+        <button type="button" class="btn btn-danger" id="clearTableBtn" style="font-size: 0.9rem;">
+          <i data-lucide="trash-2"></i> Borrar Todo
+        </button>
+        <button type="button" class="btn btn-primary" id="submitBtn" style="flex:1; justify-content: center; font-size: 1.1rem;">
+          <i data-lucide="download"></i> Generar Excel
+        </button>
       </div>
     </form>
   </div>
-  <div class="footer">
-    <p>Copyright © 2023 Gabarró. Todos los derechos reservados.</p>
-  </div>
+
   <script>
+    // Inicializar Iconos
+    lucide.createIcons();
+
+    // Referencias DOM
+    const tableBody = document.getElementById("tableBody");
+    const totalPiecesEl = document.getElementById("totalPieces");
+    const totalAreaEl = document.getElementById("totalArea");
+    const totalCantoEl = document.getElementById("totalCanto");
+
+    // OPCIONES DE CANTEADO
+    const cantosOptions = [
+      {val: "SIN CANTO", label: "SIN CANTO"},
+      {val: "1CL 1CA", label: "1 Largo + 1 Ancho (L)"},
+      {val: "1CL 2CA", label: "1 Largo + 2 Anchos (U)"},
+      {val: "2CL", label: "2 Largos (Paralelos)"},
+      {val: "2CL 1CA", label: "2 Largos + 1 Ancho (U)"},
+      {val: "1CL", label: "1 Largo Único"},
+      {val: "4C", label: "4 Cantos (Perímetro)"},
+      {val: "1CA", label: "1 Ancho Único"},
+      {val: "2CA", label: "2 Anchos (Paralelos)"}
+    ];
+
     document.addEventListener("DOMContentLoaded", function () {
-      // Establecer la fecha actual
-      const today = new Date();
-      const formattedDate = today.toLocaleDateString("es-ES");
-      document.getElementById("fecha").value = formattedDate;
+      // Poner fecha
+      document.getElementById("fecha").value = new Date().toLocaleDateString("es-ES");
       
-      // Función para generar el Excel
-      function generarExcel() {
+      // Intentar cargar datos guardados
+      loadData();
+      
+      // Si no hay filas, añadir una vacía
+      if(tableBody.children.length === 0) addNewRow();
+      
+      updateStats();
+    });
+
+    // --- LÓGICA DE TABLA ---
+
+    function createRowHTML(data = {}) {
+        const row = document.createElement("tr");
+        
+        // Generar opciones del select
+        let optionsHTML = `<option value="">- Selec -</option>`;
+        cantosOptions.forEach(opt => {
+            const selected = (data.canteado === opt.val) ? 'selected' : '';
+            optionsHTML += `<option value="${opt.val}" ${selected}>${opt.val}</option>`;
+        });
+
+        row.innerHTML = `
+          <td data-label="Canteado">
+            <select class="input-canto" onchange="saveData(); updateStats()">${optionsHTML}</select>
+          </td>
+          <td data-label="Referencia">
+            <input type="text" class="input-ref" value="${data.referencia || ''}" placeholder="Ej. Puerta izq" oninput="saveData()">
+          </td>
+          <td data-label="Material">
+            <input type="text" class="input-mat" value="${data.material || ''}" placeholder="Tipo de tablero" oninput="saveData()">
+          </td>
+          <td data-label="Grueso">
+            <input type="number" class="input-grueso" value="${data.grueso || ''}" min="0" max="100" placeholder="mm" oninput="saveData()">
+          </td>
+          <td data-label="Largo (mm)">
+            <input type="number" class="input-largo" value="${data.largo || ''}" min="0" placeholder="0" oninput="saveData(); updateStats()">
+          </td>
+          <td data-label="Ancho (mm)">
+            <input type="number" class="input-ancho" value="${data.ancho || ''}" min="0" placeholder="0" oninput="saveData(); updateStats()">
+          </td>
+          <td data-label="Unidades">
+            <input type="number" class="input-uds" value="${data.unidades || '1'}" min="1" oninput="saveData(); updateStats()">
+          </td>
+          <td data-label="Acciones">
+            <div style="display:flex; justify-content:flex-end; gap:5px;">
+                <button type="button" class="btn-icon btn-copy" title="Duplicar" onclick="duplicateRow(this)">
+                    <i data-lucide="copy" width="18" height="18"></i>
+                </button>
+                <button type="button" class="btn-icon btn-delete" title="Eliminar" onclick="deleteRow(this)">
+                    <i data-lucide="trash" width="18" height="18"></i>
+                </button>
+            </div>
+          </td>
+        `;
+        return row;
+    }
+
+    function addNewRow(data = {}) {
+      const row = createRowHTML(data);
+      tableBody.appendChild(row);
+      lucide.createIcons(); // Recargar iconos para los nuevos botones
+      updateStats();
+      saveData();
+    }
+
+    document.getElementById("addRow").addEventListener("click", () => addNewRow());
+
+    window.deleteRow = function(btn) {
+      if(confirm("¿Borrar esta línea?")) {
+        btn.closest("tr").remove();
+        saveData();
+        updateStats();
+      }
+    };
+
+    window.duplicateRow = function(btn) {
+      const tr = btn.closest("tr");
+      const data = {
+        canteado: tr.querySelector(".input-canto").value,
+        referencia: tr.querySelector(".input-ref").value,
+        material: tr.querySelector(".input-mat").value,
+        grueso: tr.querySelector(".input-grueso").value,
+        largo: tr.querySelector(".input-largo").value,
+        ancho: tr.querySelector(".input-ancho").value,
+        unidades: tr.querySelector(".input-uds").value
+      };
+      addNewRow(data);
+    };
+
+    document.getElementById("clearTableBtn").addEventListener("click", function() {
+      if(confirm("¿Estás seguro de vaciar toda la tabla?")) {
+        tableBody.innerHTML = "";
+        addNewRow(); // Añadir una limpia
+        localStorage.removeItem("gabarroData");
+        updateStats();
+      }
+    });
+
+    // --- CÁLCULOS Y ESTADÍSTICAS ---
+    function updateStats() {
+      let totalP = 0;
+      let totalM2 = 0;
+      let totalML = 0; // Total metros lineales de canto
+
+      const rows = tableBody.querySelectorAll("tr");
+      rows.forEach(row => {
+        const uds = parseInt(row.querySelector(".input-uds").value) || 0;
+        const largoMm = parseFloat(row.querySelector(".input-largo").value) || 0;
+        const anchoMm = parseFloat(row.querySelector(".input-ancho").value) || 0;
+        const cantoType = row.querySelector(".input-canto").value;
+
+        // Convertir a metros para cálculos
+        const largoM = largoMm / 1000;
+        const anchoM = anchoMm / 1000;
+
+        totalP += uds;
+        // Calculo mm a metros cuadrados: (L * A / 1,000,000) * Uds
+        totalM2 += (largoM * anchoM) * uds;
+
+        // Cálculo de Metros Lineales de Canto según selección
+        let mlPerPiece = 0;
+        switch(cantoType) {
+            case "1CL 1CA": mlPerPiece = largoM + anchoM; break;
+            case "1CL 2CA": mlPerPiece = largoM + (anchoM * 2); break;
+            case "2CL":     mlPerPiece = largoM * 2; break;
+            case "2CL 1CA": mlPerPiece = (largoM * 2) + anchoM; break;
+            case "1CL":     mlPerPiece = largoM; break;
+            case "4C":      mlPerPiece = (largoM * 2) + (anchoM * 2); break;
+            case "1CA":     mlPerPiece = anchoM; break;
+            case "2CA":     mlPerPiece = anchoM * 2; break;
+            default:        mlPerPiece = 0; // SIN CANTO o vacío
+        }
+        totalML += mlPerPiece * uds;
+      });
+
+      totalPiecesEl.textContent = `${totalP} Piezas`;
+      totalAreaEl.textContent = `${totalM2.toFixed(2)} m²`;
+      if(totalCantoEl) {
+          totalCantoEl.textContent = `${totalML.toFixed(2)} ml Canto`;
+      }
+    }
+
+    // --- LOCAL STORAGE (AUTOGUARDADO) ---
+    window.saveData = function() {
+        const formData = {
+            nombre: document.getElementById("nombre").value,
+            email: document.getElementById("email").value,
+            telefono: document.getElementById("telefono").value,
+            codigo: document.getElementById("codigoCliente").value,
+            tipo: document.querySelector('input[name="tipoPedido"]:checked').value,
+            items: []
+        };
+
+        const rows = tableBody.querySelectorAll("tr");
+        rows.forEach(row => {
+            formData.items.push({
+                canteado: row.querySelector(".input-canto").value,
+                referencia: row.querySelector(".input-ref").value,
+                material: row.querySelector(".input-mat").value,
+                grueso: row.querySelector(".input-grueso").value,
+                largo: row.querySelector(".input-largo").value,
+                ancho: row.querySelector(".input-ancho").value,
+                unidades: row.querySelector(".input-uds").value
+            });
+        });
+
+        localStorage.setItem("gabarroData", JSON.stringify(formData));
+    };
+
+    function loadData() {
+        const saved = localStorage.getItem("gabarroData");
+        if(saved) {
+            try {
+                const data = JSON.parse(saved);
+                document.getElementById("nombre").value = data.nombre || "";
+                document.getElementById("email").value = data.email || "";
+                document.getElementById("telefono").value = data.telefono || "";
+                document.getElementById("codigoCliente").value = data.codigo || "";
+                
+                if(data.tipo) {
+                    const radio = document.querySelector(`input[name="tipoPedido"][value="${data.tipo}"]`);
+                    if(radio) radio.checked = true;
+                }
+
+                if(data.items && data.items.length > 0) {
+                    tableBody.innerHTML = ""; // Limpiar tabla por defecto
+                    data.items.forEach(item => addNewRow(item));
+                }
+            } catch(e) {
+                console.error("Error cargando datos", e);
+            }
+        }
+    }
+
+    // --- LEYENDA TOGGLE ---
+    window.toggleLegend = function() {
+        document.getElementById("legendBox").classList.toggle("show");
+    }
+
+    // --- EXCEL GENERATION ---
+    document.getElementById("submitBtn").addEventListener("click", function () {
         const nombre = document.getElementById("nombre").value.trim();
         const email = document.getElementById("email").value.trim();
         const telefono = document.getElementById("telefono").value.trim();
         const codigo = document.getElementById("codigoCliente").value.trim();
-        const tipoRadio = document.querySelector('input[name="tipoPedido"]:checked');
-        const tipo = tipoRadio ? tipoRadio.value : "Pedido";
-        if (!nombre || !email || !telefono) {
-          alert("Por favor, complete los campos obligatorios: Nombre, Email y Teléfono.");
-          return null;
+        
+        // Validación básica
+        if (!nombre || !telefono) {
+            alert("Por favor, indica al menos el Nombre y Teléfono.");
+            return;
         }
-        const wb = XLSX.utils.book_new();
-        const finalData = [];
-        finalData.push(["Tipo", tipo]);
-        finalData.push(["Fecha", formattedDate]);
-        finalData.push(["Nombre", nombre]);
-        finalData.push(["Email", email]);
-        finalData.push(["Código Cliente", codigo]);
-        finalData.push(["Teléfono", telefono]);
-        finalData.push([]); // Fila en blanco
-        finalData.push(["Canteado", "Referencia", "Material", "Grueso", "Largo (Sentido veta)", "Ancho (MM)", "Unidades"]);
-        const rows = document.querySelectorAll("#tableBody tr");
-        rows.forEach((row) => {
-          const cells = row.querySelectorAll("td");
-          if (cells.length >= 7) {
-            const canteado   = cells[0].querySelector("select")?.value || "";
-            const referencia = cells[1].querySelector("input")?.value || "";
-            const material   = cells[2].querySelector("input")?.value || "";
-            const grueso     = cells[3].querySelector("input")?.value || "";
-            const largo      = cells[4].querySelector("input")?.value || "";
-            const ancho      = cells[5].querySelector("input")?.value || "";
-            const unidades   = cells[6].querySelector("input")?.value || "";
-            finalData.push([canteado, referencia, material, grueso, largo, ancho, unidades]);
-          }
-        });
-        const ws = XLSX.utils.aoa_to_sheet(finalData);
-        ws["!ref"] = XLSX.utils.encode_range({
-          s: { c: 0, r: 0 },
-          e: { c: 6, r: finalData.length - 1 }
-        });
-        applyExcelStyles(ws, finalData.length);
-        XLSX.utils.book_append_sheet(wb, ws, "Pedido");
-        const fileName = `${tipo.replace(/\s+/g, "_")}_${nombre.replace(/\s+/g, "_")}_${formattedDate.replace(/\//g, "-")}.xlsx`;
-        return { wb, fileName };
-      }
-      
-      // Botón "Descargar"
-      document.getElementById("submitBtn").addEventListener("click", function () {
-        const data = generarExcel();
-        if (!data) return;
-        XLSX.writeFile(data.wb, data.fileName, { bookType: "xlsx" });
-        alert("Archivo Excel generado correctamente.");
-      });
-      
-      // Botón "Añadir Fila"
-      document.getElementById("addRow").addEventListener("click", function () {
-        const tableBody = document.getElementById("tableBody");
-        const newRow = document.createElement("tr");
-        newRow.innerHTML = `
-          <td>
-            <select name="canteado[]">
-              <option value="">-</option>
-              <option value="SIN CANTO">SIN CANTO</option>
-              <option value="1CL 1CA">1CL 1CA</option>
-              <option value="1CL 2CA">1CL 2CA</option>
-              <option value="2CL">2CL</option>
-              <option value="2CL 1CA">2CL 1CA</option>
-              <option value="1CL">1CL</option>
-              <option value="4C">4C</option>
-              <option value="1CA">1CA</option>
-              <option value="2CA">2CA</option>
-            </select>
-          </td>
-          <td><input type="text" name="referencia[]" /></td>
-          <td><input type="text" name="material[]" /></td>
-          <td><input type="number" name="grueso[]" min="0" max="9999" /></td>
-          <td><input type="number" name="largo[]" min="0" max="9999" /></td>
-          <td><input type="number" name="ancho[]" min="0" max="9999" /></td>
-          <td><input type="number" name="unidades[]" min="1" max="9999" value="1" /></td>
-          <td><button type="button" class="delete-row-btn">-</button></td>
-        `;
-        tableBody.appendChild(newRow);
-      });
-      
-      // Delegación para borrar filas
-      document.addEventListener("click", function(e) {
-        if (e.target && e.target.classList.contains("delete-row-btn")) {
-          e.target.closest("tr").remove();
-        }
-      });
-      
-      // Botón "Limpiar Tabla": borra todas las filas y deja una fila vacía
-      document.getElementById("clearTableBtn").addEventListener("click", function() {
-        const tableBody = document.getElementById("tableBody");
-        tableBody.innerHTML = "";
-        const newRow = document.createElement("tr");
-        newRow.innerHTML = `
-          <td>
-            <select name="canteado[]">
-              <option value="">-</option>
-              <option value="SIN CANTO">SIN CANTO</option>
-              <option value="1CL 1CA">1CL 1CA</option>
-              <option value="1CL 2CA">1CL 2CA</option>
-              <option value="2CL">2CL</option>
-              <option value="2CL 1CA">2CL 1CA</option>
-              <option value="1CL">1CL</option>
-              <option value="4C">4C</option>
-              <option value="1CA">1CA</option>
-              <option value="2CA">2CA</option>
-            </select>
-          </td>
-          <td><input type="text" name="referencia[]" /></td>
-          <td><input type="text" name="material[]" /></td>
-          <td><input type="number" name="grueso[]" min="0" max="9999" /></td>
-          <td><input type="number" name="largo[]" min="0" max="9999" /></td>
-          <td><input type="number" name="ancho[]" min="0" max="9999" /></td>
-          <td><input type="number" name="unidades[]" min="1" max="9999" value="1" /></td>
-          <td><button type="button" class="delete-row-btn">-</button></td>
-        `;
-        tableBody.appendChild(newRow);
-      });
-      
-      // Función para aplicar estilos a las celdas en Excel
-      function applyExcelStyles(ws, totalRows) {
-        const range = XLSX.utils.decode_range(ws["!ref"]);
-        ws['!cols'] = [
-          { wch: 14 },
-          { wch: 20 },
-          { wch: 25 },
-          { wch: 10 },
-          { wch: 15 },
-          { wch: 12 },
-          { wch: 10 }
+
+        const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
+        const fecha = document.getElementById("fecha").value;
+
+        // Estructura de datos para Excel
+        const dataRows = [
+            ["FORMULARIO DE PRODUCCIÓN", ""],
+            ["Tipo Solicitud:", tipo],
+            ["Fecha:", fecha],
+            ["Cliente:", nombre],
+            ["Email:", email],
+            ["Teléfono:", telefono],
+            ["Cód. Cliente:", codigo],
+            [], // Espacio
+            ["Canteado", "Referencia", "Material", "Grueso", "Largo (mm)", "Ancho (mm)", "Unidades"] // Cabecera Tabla
         ];
-        for (let R = range.s.r; R <= range.e.r; R++) {
-          for (let C = range.s.c; C <= range.e.c; C++) {
-            const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
-            const cell = ws[cellRef];
-            if (!cell) continue;
-            cell.s = cell.s || {};
-            cell.s.border = {
-              top: { style: "thin", color: { rgb: "000000" } },
-              bottom: { style: "thin", color: { rgb: "000000" } },
-              left: { style: "thin", color: { rgb: "000000" } },
-              right: { style: "thin", color: { rgb: "000000" } }
-            };
-            if (R <= 5 || R === 7) {
-              cell.s.font = { bold: true };
-              if (C === 0 || R === 7) {
-                cell.s.fill = { 
-                  fgColor: { rgb: "D1E7CB" },
-                  type: "pattern",
-                  patternType: "solid"
-                };
-              }
-              cell.s.alignment = { horizontal: "center", vertical: "center" };
-            } else {
-              cell.s.alignment = { vertical: "center" };
-              if (C >= 3) {
-                cell.s.alignment.horizontal = "center";
-              }
+
+        // Obtener datos de la tabla HTML
+        const rows = tableBody.querySelectorAll("tr");
+        let hasData = false;
+
+        rows.forEach(row => {
+            const mat = row.querySelector(".input-mat").value;
+            const lar = row.querySelector(".input-largo").value;
+            const anc = row.querySelector(".input-ancho").value;
+            const uds = row.querySelector(".input-uds").value;
+
+            // Solo añadir si hay datos mínimos
+            if(mat || (lar && anc)) {
+                hasData = true;
+                dataRows.push([
+                    row.querySelector(".input-canto").value,
+                    row.querySelector(".input-ref").value,
+                    mat,
+                    row.querySelector(".input-grueso").value,
+                    lar,
+                    anc,
+                    uds
+                ]);
             }
-          }
+        });
+
+        if(!hasData) {
+            alert("La tabla está vacía. Añade al menos una medida.");
+            return;
         }
-      }
+
+        // Generar Libro
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(dataRows);
+        
+        // Ajustar anchos de columna (Visualización Excel)
+        ws['!cols'] = [
+            { wch: 15 }, // Canteado
+            { wch: 25 }, // Ref
+            { wch: 30 }, // Material
+            { wch: 8 },  // Grueso
+            { wch: 10 }, // Largo
+            { wch: 10 }, // Ancho
+            { wch: 8 }   // Uds
+        ];
+
+        XLSX.utils.book_append_sheet(wb, ws, "Produccion");
+
+        // Nombre archivo limpio
+        const cleanName = nombre.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+        const fileName = `Gabarro_${tipo}_${cleanName}.xlsx`;
+
+        XLSX.writeFile(wb, fileName);
     });
+
   </script>
 </body>
 </html>
