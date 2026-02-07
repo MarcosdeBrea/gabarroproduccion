@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>Plantilla Producción Gabarró</title>
+  <title>Plantilla Producción Gabarró + Estimador</title>
   <!-- Librería para Excel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Iconos (Lucide) para un look más moderno -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Iconos (Lucide) - Versión UMD estable -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
   
   <style>
     :root {
-      /* Variables Modo Claro (Por defecto) */
+      /* Variables Modo Claro */
       --primary: #6AAB64;
       --primary-dark: #4e8549;
       --secondary: #2c3e50;
@@ -27,415 +27,217 @@
       --preview-box-border: #9ca3af;
       --legend-bg: #f0fdf4;
       --readonly-bg: #eee;
+      --highlight-bg: #e0f2fe; 
+      --est-box-bg: rgba(255,255,255,0.6); /* Fondo cajas estimador claro */
     }
 
-    /* Variables Modo Oscuro (Automático) */
+    /* Variables Modo Oscuro */
     @media (prefers-color-scheme: dark) {
       :root {
         --primary: #6AAB64; 
         --primary-dark: #86efac;
-        --secondary: #374151; /* Gris oscuro para cabeceras */
-        --bg-color: #111827;  /* Fondo muy oscuro */
-        --white: #1f2937;     /* Fondo de tarjetas */
+        --secondary: #374151;
+        --bg-color: #111827;
+        --white: #1f2937;
         --border: #4b5563;
         --danger: #f87171;
-        --text: #f9fafb;      /* Texto blanco */
+        --text: #f9fafb;
         --text-muted: #9ca3af;
-        --input-bg: #111827;  /* Inputs más oscuros */
-        --canto-color: #4ade80; /* Verde más brillante para resaltar */
-        --preview-box-bg: #4b5563; /* Tablero oscuro en visualizador */
+        --input-bg: #111827;
+        --canto-color: #4ade80;
+        --preview-box-bg: #4b5563;
         --preview-box-border: #6b7280;
-        --legend-bg: #064e3b; /* Fondo verde oscuro leyenda */
+        --legend-bg: #064e3b;
         --readonly-bg: #374151;
+        --highlight-bg: #1e293b;
+        --est-box-bg: rgba(0,0,0,0.2); /* Fondo cajas estimador oscuro */
       }
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text);
-      padding-bottom: 80px;
-      transition: background-color 0.3s, color 0.3s;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-    }
+    body { background-color: var(--bg-color); color: var(--text); padding-bottom: 80px; transition: background-color 0.3s, color 0.3s; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
     /* --- CABECERA --- */
     .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: var(--white);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 15px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--white); padding: 20px; border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 20px;
+      flex-wrap: wrap; gap: 15px;
     }
+    .brand h1 { font-size: 1.5rem; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
+    .brand p { font-size: 0.95rem; color: var(--text-muted); font-weight: 500; }
 
-    .brand h1 {
-      font-size: 1.5rem;
-      color: var(--primary);
-      font-weight: 800;
-      letter-spacing: -0.5px;
-    }
-    .brand p {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
-
-    .order-type {
-      display: flex;
-      gap: 10px;
-      background: var(--bg-color);
-      padding: 5px;
-      border-radius: 8px;
-    }
-
+    .order-type { display: flex; gap: 10px; background: var(--bg-color); padding: 5px; border-radius: 8px; }
     .radio-label {
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--text);
+      padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;
+      font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; gap: 6px; color: var(--text);
     }
-
-    .radio-label input {
-      display: none;
-    }
-
-    .radio-label:has(input:checked) {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 2px 4px rgba(106, 171, 100, 0.3);
-    }
+    .radio-label input { display: none; }
+    .radio-label:has(input:checked) { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(106, 171, 100, 0.3); }
 
     /* --- FORMULARIO CLIENTE --- */
     .card {
-      background: var(--white);
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
+      background: var(--white); padding: 20px; border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px;
     }
-
-    .section-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--text); /* Adaptado para modo oscuro */
-    }
-
-    .grid-form {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 5px;
-      color: var(--text-muted);
-    }
-
+    .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: var(--text); }
+    .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
     .form-group input {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--input-bg);
-      color: var(--text);
-      font-size: 1rem;
-      transition: border-color 0.2s;
+      width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--input-bg); color: var(--text); font-size: 1rem; transition: border-color 0.2s;
     }
+    .form-group input:focus { outline: none; border-color: var(--primary); border-width: 2px; }
 
-    .form-group input:focus {
-      outline: none;
-      border-color: var(--primary);
-      /* En modo oscuro, el fondo blanco al focus puede ser muy brillante, 
-         mantenemos input-bg o lo hacemos un poco más claro */
-      border-width: 2px;
-    }
-
-    /* --- BARRA DE ESTADISTICAS --- */
-    .stats-container {
-      margin-bottom: 15px;
-    }
+    /* --- BARRA DE ESTADISTICAS Y ESTIMADOR --- */
+    .stats-container { margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
 
     .stats-bar {
-      background: var(--secondary);
-      color: white;
-      padding: 15px 20px;
-      border-radius: 8px;
-      font-size: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      flex-wrap: wrap;
-      gap: 10px;
+      background: var(--secondary); color: white; padding: 15px 20px; border-radius: 8px;
+      font-size: 1rem; display: flex; justify-content: space-between; align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px;
+    }
+    .stats-values { display: flex; gap: 15px; font-weight: bold; flex-wrap: wrap; align-items: center; }
+
+    /* Toggle Switch para Estimador */
+    .estimator-toggle {
+        display: flex; align-items: center; gap: 8px; cursor: pointer; 
+        background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 20px;
+    }
+    .toggle-switch {
+        position: relative; width: 40px; height: 20px; background-color: #ccc; border-radius: 20px; transition: .4s;
+    }
+    .toggle-switch:before {
+        position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px;
+        background-color: white; transition: .4s; border-radius: 50%;
+    }
+    input:checked + .toggle-switch { background-color: var(--primary); }
+    input:checked + .toggle-switch:before { transform: translateX(20px); }
+
+    /* Panel del Estimador */
+    #estimatorPanel {
+        display: none; /* Oculto por defecto */
+        background: var(--highlight-bg); border: 1px solid var(--primary);
+        padding: 8px 12px; border-radius: 8px; margin-top: 5px;
+        animation: slideDown 0.3s ease-out;
+    }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .estimator-grid {
+        display: grid; 
+        /* GRID DE UNA SOLA FILA COMPACTA */
+        /* Col 1 (Info): Flexible */
+        /* Col 2, 3, 4 (Precios): Fijos para alinear */
+        grid-template-columns: 2fr 1fr 1fr 1fr; 
+        gap: 10px; 
+        align-items: stretch;
+    }
+    
+    .estimator-result {
+        text-align: left; display: flex; flex-direction: column; gap: 1px;
+        font-size: 0.8rem; font-weight: 600;
+        background: var(--est-box-bg); /* Variable corregida para fondo */
+        padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05);
+        height: 100%; justify-content: center;
+        color: var(--text);
+    }
+    
+    .estimator-result.config-box {
+        background: transparent; border: none; padding: 0;
+        display: grid; grid-template-columns: 1fr 1.5fr; gap: 8px;
+        align-items: center;
+    }
+    
+    .config-input-group {
+        display: flex; flex-direction: column; gap: 2px;
+    }
+    
+    .config-info-group {
+        background: var(--est-box-bg); /* Variable corregida para fondo */
+        padding: 5px 8px; border-radius: 4px;
+        border: 1px dashed var(--preview-box-border);
+        height: 100%; display: flex; flex-direction: column; justify-content: center;
     }
 
-    .stats-values {
-      display: flex;
-      gap: 15px;
-      font-weight: bold;
-      flex-wrap: wrap;
+    .estimator-result.total {
+        background: var(--white); border-color: var(--primary); text-align: center;
     }
+    
+    .price-tag { font-size: 1.1rem; color: var(--primary); font-weight: 800; line-height: 1.1; }
+    .sub-info { font-size: 0.7rem; color: var(--text-muted); font-weight: normal; }
+    
+    /* Lista de tableros estimados */
+    #estBoardList { font-size: 0.7rem; color: var(--text); font-weight: 600; list-style: none; padding: 0; margin: 0; }
+    #estBoardList li { margin-bottom: 0; padding-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* --- TABLA RESPONSIVE --- */
-    .table-responsive {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-    }
-
-    /* Estilos Desktop */
+    .table-responsive { width: 100%; border-collapse: separate; border-spacing: 0; }
     .table-responsive thead th {
-      background: var(--secondary);
-      color: white;
-      padding: 12px;
-      text-align: left;
-      font-size: 0.85rem;
-      font-weight: 600;
+      background: var(--secondary); color: white; padding: 12px; text-align: left;
+      font-size: 0.85rem; font-weight: 600;
     }
     .table-responsive thead th:first-child { border-top-left-radius: 8px; }
     .table-responsive thead th:last-child { border-top-right-radius: 8px; }
-
-    .table-responsive tbody tr {
-      background: var(--white);
-      border-bottom: 1px solid var(--border);
-      transition: background 0.2s;
-    }
-    
-    .table-responsive tbody tr:hover {
-      background: var(--bg-color); /* Ligero contraste al hover */
-    }
-
-    .table-responsive td {
-      padding: 10px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-      color: var(--text);
-    }
-
-    .table-responsive input, 
-    .table-responsive select {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      font-size: 0.95rem;
-      background: var(--input-bg);
-      color: var(--text);
+    .table-responsive tbody tr { background: var(--white); border-bottom: 1px solid var(--border); }
+    .table-responsive td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); }
+    .table-responsive input, .table-responsive select {
+      width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px;
+      font-size: 0.95rem; background: var(--input-bg); color: var(--text);
     }
 
     /* --- PREVIEW VISUALIZADOR --- */
-    .canto-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+    .canto-wrapper { display: flex; align-items: center; gap: 10px; }
     .preview-box {
-        width: 36px;
-        height: 24px;
-        background-color: var(--preview-box-bg);
-        border: 1px solid var(--preview-box-border);
-        border-radius: 1px;
-        flex-shrink: 0;
-        position: relative;
-        transition: all 0.2s;
+        width: 36px; height: 24px; background-color: var(--preview-box-bg);
+        border: 1px solid var(--preview-box-border); border-radius: 1px; flex-shrink: 0;
     }
     .preview-box.c-top { border-top: 3px solid var(--canto-color); }
     .preview-box.c-bottom { border-bottom: 3px solid var(--canto-color); }
     .preview-box.c-left { border-left: 3px solid var(--canto-color); }
     .preview-box.c-right { border-right: 3px solid var(--canto-color); }
 
-
     .btn-icon {
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 5px;
-      border-radius: 4px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
+      background: none; border: none; cursor: pointer; padding: 5px; border-radius: 4px;
+      display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s;
     }
     .btn-delete { color: var(--danger); }
     .btn-delete:hover { background: rgba(239, 68, 68, 0.1); }
     .btn-copy { color: var(--text); }
     .btn-copy:hover { background: rgba(0,0,0,0.05); }
 
-    /* --- MOBILE CARD VIEW --- */
-    @media (max-width: 768px) {
-      .table-responsive thead {
-        display: none;
-      }
-      
-      .table-responsive tbody tr {
-        display: block;
-        background: var(--white);
-        margin-bottom: 15px;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        padding: 15px;
-        border: 1px solid var(--border);
-      }
-
-      .table-responsive td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border: none;
-        padding: 8px 0;
-        text-align: right;
-      }
-
-      .table-responsive td::before {
-        content: attr(data-label);
-        font-weight: 700;
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        text-align: left;
-        margin-right: 15px;
-        flex: 1;
-      }
-
-      .table-responsive td input,
-      .table-responsive td select {
-        width: 60%; 
-      }
-      
-      .canto-wrapper {
-          width: 60%;
-      }
-      .canto-wrapper select {
-          width: 100%;
-      }
-
-      .table-responsive td:last-child {
-        border-top: 1px solid var(--border);
-        padding-top: 10px;
-        margin-top: 5px;
-        justify-content: flex-end;
-        gap: 10px;
-      }
-      
-      .table-responsive td:last-child::before {
-        display: none;
-      }
-
-      .stats-bar {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .stats-values {
-        width: 100%;
-        justify-content: space-between;
-        font-size: 0.9rem;
-      }
-    }
-
-    /* --- BOTONES DE ACCIÓN --- */
-    .action-bar {
-      margin-top: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: space-between;
-      align-items: center;
-    }
-
+    /* --- BOTONES --- */
+    .action-bar { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; }
     .btn {
-      padding: 12px 24px;
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: transform 0.1s, box-shadow 0.2s;
-      text-decoration: none;
-      font-size: 0.95rem;
+      padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     }
-    
-    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 6px rgba(106, 171, 100, 0.4); }
+    .btn-outline { background: transparent; border: 2px solid var(--secondary); color: var(--secondary); }
+    .btn-danger { background: var(--danger); color: white; }
+    @media (prefers-color-scheme: dark) { .btn-outline { border-color: var(--text); color: var(--text); } }
 
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 4px 6px rgba(106, 171, 100, 0.4);
-    }
-    
-    .btn-outline {
-      background: transparent;
-      border: 2px solid var(--secondary);
-      color: var(--secondary); /* En modo oscuro usará el gris/blanco */
-    }
-    @media (prefers-color-scheme: dark) {
-        .btn-outline {
-            border-color: var(--text);
-            color: var(--text);
-        }
-    }
-
-    .btn-danger {
-      background: var(--danger); /* Usa la variable ajustada */
-      color: white; 
-    }
-    
-    /* Leyenda Modal/Toggle */
-    .legend-toggle {
-      font-size: 0.85rem;
-      color: var(--primary);
-      cursor: pointer;
-      text-decoration: underline;
-      margin-top: 10px;
-      display: inline-block;
-    }
-    .legend-content {
-      display: none;
-      background: var(--legend-bg);
-      padding: 10px;
-      border-radius: 6px;
-      margin-top: 5px;
-      font-size: 0.8rem;
-      color: var(--text);
-    }
+    /* Leyenda */
+    .legend-toggle { font-size: 0.85rem; color: var(--primary); cursor: pointer; text-decoration: underline; margin-top: 10px; display: inline-block; }
+    .legend-content { display: none; background: var(--legend-bg); padding: 10px; border-radius: 6px; margin-top: 5px; font-size: 0.8rem; color: var(--text); }
     .legend-content.show { display: block; }
-    
-    /* Readonly inputs specific fix */
-    input[readonly] {
-        background: var(--readonly-bg) !important;
-        cursor: not-allowed;
-    }
+    input[readonly] { background: var(--readonly-bg) !important; cursor: not-allowed; }
 
+    /* Mobile */
+    @media (max-width: 900px) {
+        .estimator-grid { grid-template-columns: 1fr; gap: 10px; }
+        .estimator-result.config-box { display: flex; flex-direction: column; align-items: stretch; }
+        
+        .table-responsive thead { display: none; }
+        .table-responsive tbody tr { display: block; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 15px; border: 1px solid var(--border); }
+        .table-responsive td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 8px 0; text-align: right; }
+        .table-responsive td::before { content: attr(data-label); font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-align: left; margin-right: 15px; flex: 1; }
+        .table-responsive td input, .table-responsive td select { width: 60%; }
+        .canto-wrapper { width: 60%; }
+        .stats-bar { flex-direction: column; align-items: flex-start; }
+        .stats-values { width: 100%; justify-content: space-between; font-size: 0.9rem; }
+    }
   </style>
 </head>
 <body>
@@ -478,7 +280,7 @@
           <input type="tel" id="telefono" placeholder="600 000 000" oninput="saveData()">
         </div>
         <div class="form-group">
-          <label>Código Cliente (Opcional)</label>
+          <label>Código Cliente</label>
           <input type="text" id="codigoCliente" oninput="saveData()">
         </div>
         <div class="form-group">
@@ -488,16 +290,73 @@
       </div>
     </div>
 
-    <!-- RESUMEN DE PIEZAS -->
+    <!-- ESTADISTICAS Y ESTIMADOR -->
     <div class="stats-container">
+      <!-- Barra Principal -->
       <div class="stats-bar">
         <span><i data-lucide="calculator" style="margin-right: 8px; vertical-align: middle;"></i> Resumen Total</span>
+        
         <div class="stats-values">
             <span id="totalPieces">0 Piezas</span>
             <span style="opacity: 0.3">|</span>
             <span id="totalArea">0.00 m²</span>
             <span style="opacity: 0.3">|</span>
             <span id="totalCanto" style="color: var(--canto-color);">0.00 ml Canto</span>
+            
+            <!-- Activador Estimador -->
+            <label class="estimator-toggle" title="Activar estimación de costes">
+                <span style="font-size: 0.8rem; font-weight: normal;">Estimador Costes</span>
+                <input type="checkbox" id="estimatorCheck" style="display:none" onchange="toggleEstimator()">
+                <div class="toggle-switch"></div>
+            </label>
+        </div>
+      </div>
+
+      <!-- Panel Estimador (Oculto) -->
+      <div id="estimatorPanel">
+        <!-- Título pequeño integrado si se desea, o quitar para ahorrar espacio -->
+        <!-- <div class="section-title" style="font-size: 0.85rem; border-bottom: 1px solid var(--primary); padding-bottom: 2px; margin-bottom: 5px;">Estimación de Servicios</div> -->
+        
+        <div class="estimator-grid">
+            <!-- 1. Configuración y Tableros (Combinado) -->
+            <div class="estimator-result config-box">
+                <div class="config-input-group">
+                    <label style="font-size:0.7rem; color:var(--text-muted)">Medida Tablero Ref.</label>
+                    <select id="boardSizeSelect" onchange="calculateCosts()" style="width: 100%; padding: 4px 6px; border-radius: 4px; border:1px solid var(--border); background: var(--white); color: var(--text); font-size: 0.8rem;">
+                        <option value="2800x2070">2800 x 2070</option>
+                        <option value="2850x2100">2850 x 2100</option>
+                        <option value="2440x1220">2440 x 1220</option>
+                        <option value="3050x1220">3050 x 1220</option>
+                        <option value="3660x2100">3660 x 2100</option>
+                    </select>
+                </div>
+                <div class="config-info-group">
+                    <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:2px;">Tableros Aprox.</div>
+                    <ul id="estBoardList"><li>...</li></ul>
+                </div>
+            </div>
+
+            <!-- 2. Coste Corte -->
+            <div class="estimator-result">
+                <span style="font-size:0.75rem; color:var(--text-muted)">Servicio Corte</span>
+                <span class="price-tag" id="estCortePrice">0,00 €</span>
+                <span class="sub-info" id="estCorteInfo">0 min</span>
+            </div>
+
+            <!-- 3. Coste Canto -->
+            <div class="estimator-result">
+                <span style="font-size:0.75rem; color:var(--text-muted)">Servicio Canteado</span>
+                <span class="price-tag" id="estCantoPrice">0,00 €</span>
+                <span class="sub-info" id="estCantoInfo">0 ml</span>
+            </div>
+
+            <!-- 4. Total -->
+            <div class="estimator-result total">
+                <span style="font-size:0.75rem; font-weight:bold; color:var(--secondary)">TOTAL SERVICIOS</span>
+                <span class="price-tag" style="font-size: 1.4rem;" id="estTotal">0,00 €</span>
+                <span class="sub-info" style="margin-bottom:4px;">+ IVA</span>
+                <span class="sub-info" style="border-top: 1px dashed var(--border); padding-top: 5px; width: 100%; display: block; font-size: 1.1rem; font-weight: 700; color: var(--text);" id="estPricePerMeter">0,00 €/ml</span>
+            </div>
         </div>
       </div>
     </div>
@@ -526,12 +385,12 @@
         </tbody>
       </table>
 
-      <!-- BOTÓN AGREGAR (GRANDE) -->
+      <!-- BOTÓN AGREGAR -->
       <button type="button" class="btn btn-outline" id="addRow" style="width: 100%; margin-top: 15px; border-style: dashed; justify-content: center;">
         <i data-lucide="plus-circle"></i> Añadir Pieza
       </button>
 
-      <!-- LEYENDA CANTEADO -->
+      <!-- LEYENDA -->
       <div style="margin-top: 15px; text-align: right;">
         <span class="legend-toggle" onclick="toggleLegend()">¿Qué significan los códigos de canto?</span>
         <div id="legendBox" class="legend-content" style="text-align: left;">
@@ -556,10 +415,7 @@
   </div>
 
   <script>
-    // Inicializar Iconos
-    lucide.createIcons();
-
-    // Referencias DOM
+    // Variables globales para evitar ReferenceError
     const tableBody = document.getElementById("tableBody");
     const totalPiecesEl = document.getElementById("totalPieces");
     const totalAreaEl = document.getElementById("totalArea");
@@ -578,24 +434,47 @@
       {val: "2CA", label: "2 Anchos (Paralelos)"}
     ];
 
+    // CONFIGURACIÓN TARIFAS
+    const TARIFF = {
+        corte: {
+            pricePerMin: 1.81,
+            minPrice: 35.00,
+            baseTimePerModule: 1.5, // Ajuste para grandes producciones (Cut Rite/Optimización)
+            setupTimePerLine: 2.0, // Tiempo setup cambio de medida optimizado
+            modulesRule: (thick) => {
+                if(thick < 10) return 6;
+                if(thick >= 10 && thick <= 15) return 5;
+                if(thick >= 16 && thick <= 22) return 4;
+                if(thick > 22) return 2;
+                return 4;
+            }
+        },
+        canteado: {
+            pricePerMl: 1.41,
+            minPrice: 35.00,
+            discounts: [
+                { limit: 50, discount: 0 },
+                { limit: 120, discount: 0.20 },
+                { limit: 99999, discount: 0.40 } 
+            ]
+        }
+    };
+
     document.addEventListener("DOMContentLoaded", function () {
-      // Poner fecha
+      // Inicializar iconos de forma segura una vez cargado el DOM
+      if(typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+      
       document.getElementById("fecha").value = new Date().toLocaleDateString("es-ES");
-      
-      // Intentar cargar datos guardados
       loadData();
-      
-      // Si no hay filas, añadir una vacía
       if(tableBody.children.length === 0) addNewRow();
-      
       updateStats();
     });
 
     // --- LÓGICA DE TABLA ---
-
     function createRowHTML(data = {}) {
         const row = document.createElement("tr");
-        
         let optionsHTML = `<option value="">- Selec -</option>`;
         cantosOptions.forEach(opt => {
             const selected = (data.canteado === opt.val) ? 'selected' : '';
@@ -606,26 +485,26 @@
           <td data-label="Canteado">
             <div class="canto-wrapper">
                 <select class="input-canto" onchange="handleCantoChange(this)">${optionsHTML}</select>
-                <div class="preview-box" title="Visualizador de cantos"></div>
+                <div class="preview-box" title="Visualizador"></div>
             </div>
           </td>
           <td data-label="Referencia">
-            <input type="text" class="input-ref" value="${data.referencia || ''}" placeholder="Ej. Puerta izq" oninput="saveData()">
+            <input type="text" class="input-ref" value="${data.referencia || ''}" placeholder="Ej. Puerta" oninput="saveData()">
           </td>
           <td data-label="Material">
-            <input type="text" class="input-mat" value="${data.material || ''}" placeholder="Tipo de tablero" oninput="saveData()">
+            <input type="text" class="input-mat" value="${data.material || ''}" placeholder="Tipo tablero" oninput="saveData()">
           </td>
           <td data-label="Grueso">
-            <input type="number" class="input-grueso" value="${data.grueso || ''}" min="0" max="100" placeholder="mm" oninput="saveData()">
+            <input type="number" class="input-grueso" value="${data.grueso || ''}" min="0" placeholder="mm" oninput="saveAndRecalc()">
           </td>
           <td data-label="Largo (mm)">
-            <input type="number" class="input-largo" value="${data.largo || ''}" min="0" placeholder="0" oninput="saveData(); updateStats()">
+            <input type="number" class="input-largo" value="${data.largo || ''}" min="0" placeholder="0" oninput="saveAndRecalc()">
           </td>
           <td data-label="Ancho (mm)">
-            <input type="number" class="input-ancho" value="${data.ancho || ''}" min="0" placeholder="0" oninput="saveData(); updateStats()">
+            <input type="number" class="input-ancho" value="${data.ancho || ''}" min="0" placeholder="0" oninput="saveAndRecalc()">
           </td>
           <td data-label="Unidades">
-            <input type="number" class="input-uds" value="${data.unidades || '1'}" min="1" oninput="saveData(); updateStats()">
+            <input type="number" class="input-uds" value="${data.unidades || '1'}" min="1" oninput="saveAndRecalc()">
           </td>
           <td data-label="Acciones">
             <div style="display:flex; justify-content:flex-end; gap:5px;">
@@ -638,42 +517,31 @@
             </div>
           </td>
         `;
-        
-        setTimeout(() => {
-            const select = row.querySelector('.input-canto');
-            updatePreviewBox(select);
-        }, 0);
-
+        setTimeout(() => updatePreviewBox(row.querySelector('.input-canto')), 0);
         return row;
     }
     
-    window.handleCantoChange = function(selectElement) {
-        updatePreviewBox(selectElement);
+    window.handleCantoChange = function(select) {
+        updatePreviewBox(select);
+        saveAndRecalc();
+    }
+    
+    window.saveAndRecalc = function() {
         saveData();
         updateStats();
+        calculateCosts(); 
     }
 
-    function updatePreviewBox(selectElement) {
-        const val = selectElement.value;
-        const box = selectElement.nextElementSibling;
-        
+    function updatePreviewBox(select) {
+        const val = select.value;
+        const box = select.nextElementSibling;
         box.className = 'preview-box';
-        
-        if (val.includes("4C")) {
-            box.classList.add("c-top", "c-bottom", "c-left", "c-right");
-        } else if (val === "SIN CANTO") {
-            // nada
-        } else {
-            if (val.includes("2CL")) {
-                box.classList.add("c-top", "c-bottom");
-            } else if (val.includes("1CL")) {
-                box.classList.add("c-top");
-            }
-            if (val.includes("2CA")) {
-                box.classList.add("c-left", "c-right");
-            } else if (val.includes("1CA")) {
-                box.classList.add("c-right");
-            }
+        if (val.includes("4C")) box.classList.add("c-top", "c-bottom", "c-left", "c-right");
+        else if (val !== "SIN CANTO") {
+            if (val.includes("2CL")) box.classList.add("c-top", "c-bottom");
+            else if (val.includes("1CL")) box.classList.add("c-top");
+            if (val.includes("2CA")) box.classList.add("c-left", "c-right");
+            else if (val.includes("1CA")) box.classList.add("c-right");
         }
     }
 
@@ -681,18 +549,14 @@
       if (Object.keys(data).length === 0) {
         const lastRow = tableBody.lastElementChild;
         if (lastRow) {
-            const lastMat = lastRow.querySelector(".input-mat").value;
-            const lastGrueso = lastRow.querySelector(".input-grueso").value;
-            if (lastMat) data.material = lastMat;
-            if (lastGrueso) data.grueso = lastGrueso;
+            data.material = lastRow.querySelector(".input-mat").value;
+            data.grueso = lastRow.querySelector(".input-grueso").value;
         }
       }
-
       const row = createRowHTML(data);
       tableBody.appendChild(row);
-      lucide.createIcons();
-      updateStats();
-      saveData();
+      if(typeof lucide !== 'undefined') lucide.createIcons();
+      saveAndRecalc();
     }
 
     document.getElementById("addRow").addEventListener("click", () => addNewRow());
@@ -700,8 +564,7 @@
     window.deleteRow = function(btn) {
       if(confirm("¿Borrar esta línea?")) {
         btn.closest("tr").remove();
-        saveData();
-        updateStats();
+        saveAndRecalc();
       }
     };
 
@@ -723,53 +586,163 @@
       if(confirm("¿Estás seguro de vaciar toda la tabla?")) {
         tableBody.innerHTML = "";
         addNewRow(); 
-        localStorage.removeItem("gabarroData");
-        updateStats();
+        localStorage.removeItem("gabarroDataEstimator");
+        saveAndRecalc();
       }
     });
 
-    // --- CÁLCULOS Y ESTADÍSTICAS ---
+    // --- CÁLCULOS ESTADÍSTICAS BÁSICAS ---
     function updateStats() {
-      let totalP = 0;
-      let totalM2 = 0;
-      let totalML = 0;
-
-      const rows = tableBody.querySelectorAll("tr");
-      rows.forEach(row => {
+      let totalP = 0, totalM2 = 0, totalML = 0;
+      tableBody.querySelectorAll("tr").forEach(row => {
         const uds = parseInt(row.querySelector(".input-uds").value) || 0;
-        const largoMm = parseFloat(row.querySelector(".input-largo").value) || 0;
-        const anchoMm = parseFloat(row.querySelector(".input-ancho").value) || 0;
+        const largo = (parseFloat(row.querySelector(".input-largo").value) || 0) / 1000;
+        const ancho = (parseFloat(row.querySelector(".input-ancho").value) || 0) / 1000;
         const cantoType = row.querySelector(".input-canto").value;
 
-        const largoM = largoMm / 1000;
-        const anchoM = anchoMm / 1000;
-
         totalP += uds;
-        totalM2 += (largoM * anchoM) * uds;
-
+        totalM2 += (largo * ancho) * uds;
+        
         let mlPerPiece = 0;
-        switch(cantoType) {
-            case "1CL 1CA": mlPerPiece = largoM + anchoM; break;
-            case "1CL 2CA": mlPerPiece = largoM + (anchoM * 2); break;
-            case "2CL":     mlPerPiece = largoM * 2; break;
-            case "2CL 1CA": mlPerPiece = (largoM * 2) + anchoM; break;
-            case "1CL":     mlPerPiece = largoM; break;
-            case "4C":      mlPerPiece = (largoM * 2) + (anchoM * 2); break;
-            case "1CA":     mlPerPiece = anchoM; break;
-            case "2CA":     mlPerPiece = anchoM * 2; break;
-            default:        mlPerPiece = 0;
-        }
+        if(cantoType === "1CL 1CA") mlPerPiece = largo + ancho;
+        else if(cantoType === "1CL 2CA") mlPerPiece = largo + (ancho * 2);
+        else if(cantoType === "2CL") mlPerPiece = largo * 2;
+        else if(cantoType === "2CL 1CA") mlPerPiece = (largo * 2) + ancho;
+        else if(cantoType === "1CL") mlPerPiece = largo;
+        else if(cantoType === "4C") mlPerPiece = (largo * 2) + (ancho * 2);
+        else if(cantoType === "1CA") mlPerPiece = ancho;
+        else if(cantoType === "2CA") mlPerPiece = ancho * 2;
+        
         totalML += mlPerPiece * uds;
       });
 
       totalPiecesEl.textContent = `${totalP} Piezas`;
       totalAreaEl.textContent = `${totalM2.toFixed(2)} m²`;
-      if(totalCantoEl) {
-          totalCantoEl.textContent = `${totalML.toFixed(2)} ml Canto`;
-      }
+      totalCantoEl.textContent = `${totalML.toFixed(2)} ml Canto`;
     }
 
-    // --- LOCAL STORAGE ---
+    // --- LOGICA ESTIMADOR DE COSTES ---
+    function toggleEstimator() {
+        const panel = document.getElementById("estimatorPanel");
+        const isChecked = document.getElementById("estimatorCheck").checked;
+        panel.style.display = isChecked ? "block" : "none";
+        if(isChecked) calculateCosts();
+        saveData(); 
+    }
+
+    function calculateCosts() {
+        if(!document.getElementById("estimatorCheck").checked) return;
+
+        let totalMinutes = 0;
+        let totalEdgingMeters = 0;
+        let totalPerimeter = 0; // Metros lineales de lados de todas las piezas (para el cálculo de precio unitario)
+        let boardGroups = {}; 
+
+        // Obtener medidas del tablero seleccionado
+        const boardSizeStr = document.getElementById("boardSizeSelect").value;
+        const [bL, bW] = boardSizeStr.split("x").map(Number);
+        const boardAreaM2 = (bL/1000) * (bW/1000);
+        
+        tableBody.querySelectorAll("tr").forEach(row => {
+            const uds = parseInt(row.querySelector(".input-uds").value) || 0;
+            if(uds === 0) return;
+
+            const mat = row.querySelector(".input-mat").value.toUpperCase() || "GENÉRICO";
+            const thick = parseInt(row.querySelector(".input-grueso").value) || 19;
+            const largoMm = parseFloat(row.querySelector(".input-largo").value) || 0;
+            const anchoMm = parseFloat(row.querySelector(".input-ancho").value) || 0;
+            
+            const largoM = largoMm / 1000;
+            const anchoM = anchoMm / 1000;
+
+            // --- 0. CÁLCULO DE PERÍMETRO (Para unitario) ---
+            // Suma de los lados de todas las piezas (Perímetro = 2L + 2A)
+            const piecePerimeter = (largoM + anchoM) * 2;
+            totalPerimeter += (piecePerimeter * uds);
+
+            // --- 1. CÁLCULO DE TABLEROS ---
+            const groupKey = `${mat}|${thick}`;
+            if(!boardGroups[groupKey]) boardGroups[groupKey] = 0;
+            const pieceAreaM2 = largoM * anchoM;
+            boardGroups[groupKey] += (pieceAreaM2 * uds);
+
+            // --- 2. CÁLCULO DE CORTE ---
+            const divisor = TARIFF.corte.modulesRule(thick);
+            const modulesPerLine = Math.ceil(uds / divisor);
+            const lineMinutes = (modulesPerLine * TARIFF.corte.baseTimePerModule) + TARIFF.corte.setupTimePerLine;
+            totalMinutes += lineMinutes;
+
+            // --- 3. CÁLCULO DE CANTO ---
+            const cantoType = row.querySelector(".input-canto").value;
+            let ml = 0;
+
+            if(cantoType.includes("4C")) ml = (largoM+anchoM)*2;
+            else if(cantoType !== "SIN CANTO" && cantoType !== "") {
+                if(cantoType.includes("CL")) ml += largoM * (cantoType.includes("2CL") ? 2 : 1);
+                if(cantoType.includes("CA")) ml += anchoM * (cantoType.includes("2CA") ? 2 : 1);
+            }
+            totalEdgingMeters += (ml * uds);
+        });
+
+        // RENDERIZAR LISTA TABLEROS
+        const boardListEl = document.getElementById("estBoardList");
+        boardListEl.innerHTML = "";
+        let hasBoards = false;
+        
+        const WASTE_FACTOR = 1.20; 
+
+        for (const [key, totalArea] of Object.entries(boardGroups)) {
+            const [mat, thick] = key.split("|");
+            const needed = (totalArea * WASTE_FACTOR) / boardAreaM2;
+            const count = Math.ceil(needed);
+            const li = document.createElement("li");
+            li.innerHTML = `<strong>${count}</strong> de ${bL} x ${bW} x ${thick} mm`;
+            boardListEl.appendChild(li);
+            hasBoards = true;
+        }
+        if(!hasBoards) boardListEl.innerHTML = "<li>Añade medidas...</li>";
+
+        // PRECIO CORTE
+        let cortePrice = totalMinutes * TARIFF.corte.pricePerMin;
+        if (cortePrice < TARIFF.corte.minPrice && cortePrice > 0) cortePrice = TARIFF.corte.minPrice;
+        if (totalMinutes === 0) cortePrice = 0;
+
+        // PRECIO CANTO
+        const roundedEdgingMeters = Math.ceil(totalEdgingMeters); 
+        
+        let discount = 0;
+        if (roundedEdgingMeters >= 120) discount = 0.40;
+        else if (roundedEdgingMeters >= 50) discount = 0.20;
+
+        let cantoGrossPrice = roundedEdgingMeters * TARIFF.canteado.pricePerMl;
+        let cantoNetPrice = cantoGrossPrice * (1 - discount);
+        
+        if (cantoNetPrice < TARIFF.canteado.minPrice && cantoNetPrice > 0) cantoNetPrice = TARIFF.canteado.minPrice;
+        if (roundedEdgingMeters === 0) cantoNetPrice = 0;
+
+        // --- CÁLCULO PRECIO POR METRO LINEAL (NUEVO REQUERIMIENTO) ---
+        // (Coste Corte / Metros Perímetro) + (Coste Canto / Metros Canto)
+        let unitCorte = totalPerimeter > 0 ? (cortePrice / totalPerimeter) : 0;
+        // Usamos roundedEdgingMeters para el divisor para ser consistentes con el precio facturado, o totalEdgingMeters? 
+        // El precio sale de rounded, así que usamos rounded para el unitario promedio efectivo.
+        let unitCanto = roundedEdgingMeters > 0 ? (cantoNetPrice / roundedEdgingMeters) : 0;
+        let pricePerLinealMeter = unitCorte + unitCanto;
+
+        // RENDERIZADO PRECIOS
+        document.getElementById("estCortePrice").textContent = cortePrice.toFixed(2) + " €";
+        document.getElementById("estCorteInfo").textContent = `${totalMinutes.toFixed(0)} min`;
+        
+        document.getElementById("estCantoPrice").textContent = cantoNetPrice.toFixed(2) + " €";
+        document.getElementById("estCantoInfo").textContent = `${roundedEdgingMeters} ml (Dto. ${(discount*100).toFixed(0)}%)`;
+
+        const grandTotal = cortePrice + cantoNetPrice;
+        document.getElementById("estTotal").textContent = grandTotal.toFixed(2) + " €";
+        
+        // Renderizado Precio por ML
+        document.getElementById("estPricePerMeter").textContent = pricePerLinealMeter.toFixed(2) + " €/ml";
+    }
+
+    // --- GUARDADO Y EXCEL ---
     window.saveData = function() {
         const formData = {
             nombre: document.getElementById("nombre").value,
@@ -777,11 +750,11 @@
             telefono: document.getElementById("telefono").value,
             codigo: document.getElementById("codigoCliente").value,
             tipo: document.querySelector('input[name="tipoPedido"]:checked').value,
+            estimatorActive: document.getElementById("estimatorCheck").checked, 
+            boardSize: document.getElementById("boardSizeSelect").value,
             items: []
         };
-
-        const rows = tableBody.querySelectorAll("tr");
-        rows.forEach(row => {
+        tableBody.querySelectorAll("tr").forEach(row => {
             formData.items.push({
                 canteado: row.querySelector(".input-canto").value,
                 referencia: row.querySelector(".input-ref").value,
@@ -792,12 +765,11 @@
                 unidades: row.querySelector(".input-uds").value
             });
         });
-
-        localStorage.setItem("gabarroData", JSON.stringify(formData));
+        localStorage.setItem("gabarroDataEstimator", JSON.stringify(formData));
     };
 
     function loadData() {
-        const saved = localStorage.getItem("gabarroData");
+        const saved = localStorage.getItem("gabarroDataEstimator");
         if(saved) {
             try {
                 const data = JSON.parse(saved);
@@ -805,97 +777,65 @@
                 document.getElementById("email").value = data.email || "";
                 document.getElementById("telefono").value = data.telefono || "";
                 document.getElementById("codigoCliente").value = data.codigo || "";
-                
                 if(data.tipo) {
                     const radio = document.querySelector(`input[name="tipoPedido"][value="${data.tipo}"]`);
                     if(radio) radio.checked = true;
                 }
+                if(data.estimatorActive) {
+                    document.getElementById("estimatorCheck").checked = true;
+                    document.getElementById("estimatorPanel").style.display = "block";
+                }
+                if(data.boardSize) document.getElementById("boardSizeSelect").value = data.boardSize;
 
                 if(data.items && data.items.length > 0) {
-                    tableBody.innerHTML = ""; 
+                    tableBody.innerHTML = "";
                     data.items.forEach(item => addNewRow(item));
                 }
-            } catch(e) {
-                console.error("Error cargando datos", e);
-            }
+            } catch(e) { console.error("Error cargando datos", e); }
         }
     }
 
-    window.toggleLegend = function() {
-        document.getElementById("legendBox").classList.toggle("show");
-    }
-
-    // --- EXCEL GENERATION ---
+    window.toggleLegend = function() { document.getElementById("legendBox").classList.toggle("show"); }
 
     function downloadExcel() {
         const nombre = document.getElementById("nombre").value.trim();
-        const email = document.getElementById("email").value.trim();
-        const telefono = document.getElementById("telefono").value.trim();
-        const codigo = document.getElementById("codigoCliente").value.trim();
-        
-        if (!nombre || !telefono) {
-            alert("Por favor, indica al menos el Nombre y Teléfono.");
-            return;
-        }
-
-        // Verificar filas vacías
         const rows = tableBody.querySelectorAll("tr");
+        
         let hasData = false;
-        rows.forEach(row => {
-            if(row.querySelector(".input-mat").value || row.querySelector(".input-largo").value) hasData = true;
-        });
-
-        if(!hasData) {
-            alert("La tabla está vacía. Añade al menos una medida.");
-            return;
-        }
+        rows.forEach(row => { if(row.querySelector(".input-mat").value || (row.querySelector(".input-largo").value && row.querySelector(".input-ancho").value)) hasData = true; });
+        if(!hasData) { alert("Tabla vacía."); return; }
+        if (!nombre) { alert("Indica el Nombre."); return; }
 
         const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
-        const fecha = document.getElementById("fecha").value;
-
         const dataRows = [
-            ["FORMULARIO DE PRODUCCIÓN", ""],
-            ["Tipo Solicitud:", tipo],
-            ["Fecha:", fecha],
+            ["FORMULARIO GABARRÓ", ""],
+            ["Tipo:", tipo],
             ["Cliente:", nombre],
-            ["Email:", email],
-            ["Teléfono:", telefono],
-            ["Cód. Cliente:", codigo],
+            ["Teléfono:", document.getElementById("telefono").value],
             [],
-            ["Canteado", "Referencia", "Material", "Grueso", "Largo (mm)", "Ancho (mm)", "Unidades"]
+            ["Canteado", "Ref", "Material", "Grueso", "Largo", "Ancho", "Uds"]
         ];
 
         rows.forEach(row => {
-            const mat = row.querySelector(".input-mat").value;
-            const lar = row.querySelector(".input-largo").value;
-            const anc = row.querySelector(".input-ancho").value;
-            const uds = row.querySelector(".input-uds").value;
-
-            if(mat || (lar && anc)) {
-                dataRows.push([
-                    row.querySelector(".input-canto").value,
-                    row.querySelector(".input-ref").value,
-                    mat,
-                    row.querySelector(".input-grueso").value,
-                    lar,
-                    anc,
-                    uds
-                ]);
-            }
+            dataRows.push([
+                row.querySelector(".input-canto").value,
+                row.querySelector(".input-ref").value,
+                row.querySelector(".input-mat").value,
+                row.querySelector(".input-grueso").value,
+                row.querySelector(".input-largo").value,
+                row.querySelector(".input-ancho").value,
+                row.querySelector(".input-uds").value
+            ]);
         });
+        
+        // Eliminada la sección de estimaciones del Excel a petición del usuario
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(dataRows);
         ws['!cols'] = [ {wch:15}, {wch:25}, {wch:30}, {wch:8}, {wch:10}, {wch:10}, {wch:8} ];
         XLSX.utils.book_append_sheet(wb, ws, "Produccion");
-
-        // Nombre archivo
-        const cleanName = nombre.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-        const fileName = `Gabarro_${tipo}_${cleanName}.xlsx`;
-
-        XLSX.writeFile(wb, fileName);
+        XLSX.writeFile(wb, `Gabarro_${nombre.replace(/ /g,'_')}.xlsx`);
     }
-
   </script>
 </body>
 </html>
