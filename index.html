@@ -79,19 +79,46 @@
     .radio-label input { display: none; }
     .radio-label:has(input:checked) { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(106, 171, 100, 0.3); }
 
-    /* --- FORMULARIO CLIENTE --- */
+    /* --- FORMULARIO CLIENTE (NUEVO DISEÑO FILA ÚNICA) --- */
     .card {
       background: var(--white); padding: 20px; border-radius: 12px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px;
     }
     .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: var(--text); }
-    .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-muted); }
-    .form-group input {
-      width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px;
-      background: var(--input-bg); color: var(--text); font-size: 1rem; transition: border-color 0.2s;
+    
+    .grid-form { 
+      display: flex; 
+      flex-wrap: wrap; /* Por defecto envuelve en móviles */
+      gap: 10px; 
+      align-items: flex-end; /* Alinea los inputs abajo si las etiquetas varían */
     }
-    .form-group input:focus { outline: none; border-color: var(--primary); border-width: 2px; }
+    
+    .form-group {
+        display: flex; flex-direction: column;
+        min-width: 0; /* Permite encoger más allá del contenido */
+        flex: 1 1 auto; /* Flexibilidad base */
+    }
+
+    /* REGLAS ESPECÍFICAS PARA FILA ÚNICA EN ESCRITORIO (>1024px) */
+    @media (min-width: 1024px) {
+        .grid-form {
+            flex-wrap: nowrap; /* Fuerza una sola línea */
+        }
+        /* Asignación de espacios relativos */
+        .fg-name { flex: 3; }  /* Más espacio para nombre */
+        .fg-email { flex: 2.2; } /* Espacio ajustado para email */
+        .fg-tel { flex: 1.2; }   /* Reducido para teléfono (9 dígitos) */
+        .fg-code { flex: 0 0 140px; } /* Ancho fijo ampliado para "Código Cliente" */
+        .fg-date { flex: 0 0 110px; } /* Ancho fijo pequeño para fecha */
+    }
+
+    .form-group label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group input {
+      width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--input-bg); color: var(--text); font-size: 0.95rem; transition: border-color 0.2s;
+      height: 38px; /* Altura unificada */
+    }
+    .form-group input:focus { outline: none; border-color: var(--primary); border-width: 2px; padding: 7px 9px; /* Ajuste por borde */ }
 
     /* --- BARRA DE ESTADISTICAS Y ESTIMADOR --- */
     .stats-container { margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
@@ -276,29 +303,29 @@
       </div>
     </header>
 
-    <!-- FORMULARIO DATOS -->
+    <!-- FORMULARIO DATOS (OPTIMIZADO FILA ÚNICA) -->
     <div class="card">
       <div class="section-title"><i data-lucide="user"></i> Datos del Cliente</div>
       <div class="grid-form">
-        <div class="form-group">
+        <div class="form-group fg-name">
           <label>Nombre *</label>
-          <input type="text" id="nombre" placeholder="Nombre completo o Empresa" oninput="saveData()">
+          <input type="text" id="nombre" placeholder="Nombre / Empresa" oninput="saveData()">
         </div>
-        <div class="form-group">
+        <div class="form-group fg-email">
           <label>Email *</label>
           <input type="email" id="email" placeholder="cliente@email.com" oninput="saveData()">
         </div>
-        <div class="form-group">
+        <div class="form-group fg-tel">
           <label>Teléfono *</label>
           <input type="tel" id="telefono" placeholder="600 000 000" oninput="saveData()">
         </div>
-        <div class="form-group">
+        <div class="form-group fg-code">
           <label>Código Cliente</label>
-          <input type="text" id="codigoCliente" oninput="saveData()">
+          <input type="text" id="codigoCliente" oninput="saveData()" style="text-align: center;">
         </div>
-        <div class="form-group">
+        <div class="form-group fg-date">
           <label>Fecha</label>
-          <input type="text" id="fecha" readonly>
+          <input type="text" id="fecha" readonly style="text-align: center;">
         </div>
       </div>
     </div>
@@ -909,6 +936,8 @@
             ]);
         });
         
+        // Eliminada la sección de estimaciones del Excel a petición del usuario
+
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(dataRows);
         ws['!cols'] = [ {wch:15}, {wch:25}, {wch:30}, {wch:8}, {wch:10}, {wch:10}, {wch:8} ];
