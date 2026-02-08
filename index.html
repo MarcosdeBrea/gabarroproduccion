@@ -326,6 +326,8 @@
                         <option value="2800x2070">2800 x 2070</option>
                         <option value="2850x2100">2850 x 2100</option>
                         <option value="2440x1220">2440 x 1220</option>
+                        <option value="2500x1220">2500 x 1220</option>
+                        <option value="2500x1250">2500 x 1250</option>
                         <option value="3050x1220">3050 x 1220</option>
                         <option value="3660x2100">3660 x 2100</option>
                     </select>
@@ -434,7 +436,7 @@
       {val: "2CA", label: "2 Anchos (Paralelos)"}
     ];
 
-    // CONFIGURACIÓN TARIFAS
+    // CONFIGURACIÓN TARIFAS - MODULOS AJUSTADOS EXACTOS A TARIFA SECCIONADORA PDF
     const TARIFF = {
         corte: {
             pricePerMin: 1.81,
@@ -442,11 +444,15 @@
             baseTimePerModule: 1.5, // Ajuste para grandes producciones (Cut Rite/Optimización)
             setupTimePerLine: 2.0, // Tiempo setup cambio de medida optimizado
             modulesRule: (thick) => {
-                if(thick < 10) return 6;
-                if(thick >= 10 && thick <= 15) return 5;
-                if(thick >= 16 && thick <= 22) return 4;
-                if(thick > 22) return 2;
-                return 4;
+                // Mapeo exacto columna GRUESO -> PIEZAS del PDF "Tarifa Seccionadora"
+                if (thick < 8) return 9; // 7mm
+                if (thick < 10) return 8; // 8mm
+                if (thick < 13) return 6; // 10mm, 12mm -> 6 piezas
+                if (thick < 18) return 5; // 13mm, 15mm, 16mm -> 5 piezas
+                if (thick < 22) return 4; // 18mm, 19mm -> 4 piezas
+                if (thick < 28) return 3; // 22mm, 25mm -> 3 piezas
+                if (thick < 45) return 2; // 28mm, 30mm, 35mm, 40mm -> 2 piezas
+                return 1; // 45mm, 50mm -> 1 pieza
             }
         },
         canteado: {
