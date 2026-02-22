@@ -833,7 +833,7 @@
         row.innerHTML = `
           <td data-label="Canteado">
             <div class="canto-wrapper">
-                <select class="input-canto" onchange="window.handleCantoChange(this)">${optionsHTML}</select>
+                <select class="input-canto" onchange="window.updatePreviewBox(this); window.saveAndRecalc();">${optionsHTML}</select>
                 <div class="preview-box" title="Visualizador"></div>
             </div>
           </td>
@@ -899,10 +899,8 @@
     };
 
     window.deleteRow = function(btn) {
-      if(confirm("¿Borrar esta línea?")) {
         btn.closest("tr").remove();
         window.saveAndRecalc();
-      }
     };
 
     window.downloadExcel = function() {
