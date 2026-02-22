@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Plantilla Producción Gabarró + Estimador</title>
   <!-- Librería para Excel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <!-- Iconos (Lucide) - Versión UMD estable -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-  
+
   <style>
     :root {
       /* Variables Modo Claro */
@@ -27,15 +28,17 @@
       --preview-box-border: #9ca3af;
       --legend-bg: #f0fdf4;
       --readonly-bg: #eee;
-      --highlight-bg: #e0f2fe; 
-      --est-box-bg: rgba(255,255,255,0.6); /* Fondo cajas estimador claro */
-      --delivery-bg: #ecfdf5; /* Fondo verde claro para entrega */
+      --highlight-bg: #e0f2fe;
+      --est-box-bg: rgba(255, 255, 255, 0.6);
+      /* Fondo cajas estimador claro */
+      --delivery-bg: #ecfdf5;
+      /* Fondo verde claro para entrega */
     }
 
     /* Variables Modo Oscuro */
     @media (prefers-color-scheme: dark) {
       :root {
-        --primary: #6AAB64; 
+        --primary: #6AAB64;
         --primary-dark: #86efac;
         --secondary: #374151;
         --bg-color: #111827;
@@ -51,246 +54,652 @@
         --legend-bg: #064e3b;
         --readonly-bg: #374151;
         --highlight-bg: #1e293b;
-        --est-box-bg: rgba(0,0,0,0.2); /* Fondo cajas estimador oscuro */
-        --delivery-bg: rgba(6, 78, 59, 0.4); /* Fondo entrega oscuro */
+        --est-box-bg: rgba(0, 0, 0, 0.2);
+        /* Fondo cajas estimador oscuro */
+        --delivery-bg: rgba(6, 78, 59, 0.4);
+        /* Fondo entrega oscuro */
       }
     }
 
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
 
-    body { background-color: var(--bg-color); color: var(--text); padding-bottom: 80px; transition: background-color 0.3s, color 0.3s; }
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    body {
+      background-color: var(--bg-color);
+      color: var(--text);
+      padding-bottom: 80px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
 
     /* --- CABECERA --- */
     .header {
-      display: flex; justify-content: space-between; align-items: center;
-      background: var(--white); padding: 20px; border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); margin-bottom: 20px;
-      flex-wrap: wrap; gap: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--white);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
     }
-    .brand h1 { font-size: 1.5rem; color: var(--primary); font-weight: 800; letter-spacing: -0.5px; }
-    .brand p { font-size: 0.95rem; color: var(--text-muted); font-weight: 500; }
 
-    .order-type { display: flex; gap: 10px; background: var(--bg-color); padding: 5px; border-radius: 8px; }
-    .radio-label {
-      padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600;
-      font-size: 0.9rem; transition: all 0.2s; display: flex; align-items: center; gap: 6px; color: var(--text);
+    .brand h1 {
+      font-size: 1.5rem;
+      color: var(--primary);
+      font-weight: 800;
+      letter-spacing: -0.5px;
     }
-    .radio-label input { display: none; }
-    .radio-label:has(input:checked) { background: var(--primary); color: white; box-shadow: 0 2px 4px rgba(106, 171, 100, 0.3); }
+
+    .brand p {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .order-type {
+      display: flex;
+      gap: 10px;
+      background: var(--bg-color);
+      padding: 5px;
+      border-radius: 8px;
+    }
+
+    .radio-label {
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text);
+    }
+
+    .radio-label input {
+      display: none;
+    }
+
+    .radio-label:has(input:checked) {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 4px rgba(106, 171, 100, 0.3);
+    }
 
     /* --- FORMULARIO CLIENTE (NUEVO DISEÑO FILA ÚNICA) --- */
     .card {
-      background: var(--white); padding: 20px; border-radius: 12px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px;
+      background: var(--white);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
     }
-    .section-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; color: var(--text); }
-    
-    .grid-form { 
-      display: flex; 
-      flex-wrap: wrap; /* Por defecto envuelve en móviles */
-      gap: 10px; 
-      align-items: flex-end; /* Alinea los inputs abajo si las etiquetas varían */
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
     }
-    
+
+    .grid-form {
+      display: flex;
+      flex-wrap: wrap;
+      /* Por defecto envuelve en móviles */
+      gap: 10px;
+      align-items: flex-end;
+      /* Alinea los inputs abajo si las etiquetas varían */
+    }
+
     .form-group {
-        display: flex; flex-direction: column;
-        min-width: 0; /* Permite encoger más allá del contenido */
-        flex: 1 1 auto; /* Flexibilidad base */
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      /* Permite encoger más allá del contenido */
+      flex: 1 1 auto;
+      /* Flexibilidad base */
     }
 
     /* REGLAS ESPECÍFICAS PARA FILA ÚNICA EN ESCRITORIO (>1024px) */
     @media (min-width: 1024px) {
-        .grid-form {
-            flex-wrap: nowrap; /* Fuerza una sola línea */
-        }
-        /* Asignación de espacios relativos */
-        .fg-name { flex: 3; }  /* Más espacio para nombre */
-        .fg-email { flex: 2.2; } /* Espacio ajustado para email */
-        .fg-tel { flex: 1.2; }   /* Reducido para teléfono (9 dígitos) */
-        .fg-code { flex: 0 0 140px; } /* Ancho fijo ampliado para "Código Cliente" */
-        .fg-date { flex: 0 0 110px; } /* Ancho fijo pequeño para fecha */
+      .grid-form {
+        flex-wrap: nowrap;
+        /* Fuerza una sola línea */
+      }
+
+      /* Asignación de espacios relativos */
+      .fg-name {
+        flex: 3;
+      }
+
+      /* Más espacio para nombre */
+      .fg-email {
+        flex: 2.2;
+      }
+
+      /* Espacio ajustado para email */
+      .fg-tel {
+        flex: 1.2;
+      }
+
+      /* Reducido para teléfono (9 dígitos) */
+      .fg-code {
+        flex: 0 0 140px;
+      }
+
+      /* Ancho fijo ampliado para "Código Cliente" */
+      .fg-date {
+        flex: 0 0 110px;
+      }
+
+      /* Ancho fijo pequeño para fecha */
     }
 
-    .form-group label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    .form-group input {
-      width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px;
-      background: var(--input-bg); color: var(--text); font-size: 0.95rem; transition: border-color 0.2s;
-      height: 38px; /* Altura unificada */
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .form-group input:focus { outline: none; border-color: var(--primary); border-width: 2px; padding: 7px 9px; /* Ajuste por borde */ }
+
+    .form-group input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+      height: 38px;
+      /* Altura unificada */
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      border-width: 2px;
+      padding: 7px 9px;
+      /* Ajuste por borde */
+    }
 
     /* --- BARRA DE ESTADISTICAS Y ESTIMADOR --- */
-    .stats-container { margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+    .stats-container {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
     .stats-bar {
-      background: var(--secondary); color: white; padding: 15px 20px; border-radius: 8px;
-      font-size: 1rem; display: flex; justify-content: space-between; align-items: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1); flex-wrap: wrap; gap: 10px;
+      background: var(--secondary);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      flex-wrap: wrap;
+      gap: 10px;
     }
-    .stats-values { display: flex; gap: 15px; font-weight: bold; flex-wrap: wrap; align-items: center; }
+
+    .stats-values {
+      display: flex;
+      gap: 15px;
+      font-weight: bold;
+      flex-wrap: wrap;
+      align-items: center;
+    }
 
     /* Toggle Switch para Estimador */
     .estimator-toggle {
-        display: flex; align-items: center; gap: 8px; cursor: pointer; 
-        background: rgba(255,255,255,0.1); padding: 5px 10px; border-radius: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 5px 10px;
+      border-radius: 20px;
     }
+
     .toggle-switch {
-        position: relative; width: 40px; height: 20px; background-color: #ccc; border-radius: 20px; transition: .4s;
+      position: relative;
+      width: 40px;
+      height: 20px;
+      background-color: #ccc;
+      border-radius: 20px;
+      transition: .4s;
     }
+
     .toggle-switch:before {
-        position: absolute; content: ""; height: 16px; width: 16px; left: 2px; bottom: 2px;
-        background-color: white; transition: .4s; border-radius: 50%;
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
     }
-    input:checked + .toggle-switch { background-color: var(--primary); }
-    input:checked + .toggle-switch:before { transform: translateX(20px); }
+
+    input:checked+.toggle-switch {
+      background-color: var(--primary);
+    }
+
+    input:checked+.toggle-switch:before {
+      transform: translateX(20px);
+    }
 
     /* Panel del Estimador */
     #estimatorPanel {
-        display: none; /* Oculto por defecto */
-        background: var(--highlight-bg); border: 1px solid var(--primary);
-        padding: 8px 12px; border-radius: 8px; margin-top: 5px;
-        animation: slideDown 0.3s ease-out;
+      display: none;
+      /* Oculto por defecto */
+      background: var(--highlight-bg);
+      border: 1px solid var(--primary);
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-top: 5px;
+      animation: slideDown 0.3s ease-out;
     }
-    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
     .estimator-grid {
-        display: grid; 
-        /* GRID DE UNA SOLA FILA COMPACTA */
-        /* Col 1 (Info): Flexible */
-        /* Col 2, 3, 4 (Precios): Fijos para alinear */
-        grid-template-columns: 2fr 1fr 1fr 1fr; 
-        gap: 10px; 
-        align-items: stretch;
+      display: grid;
+      /* GRID DE UNA SOLA FILA COMPACTA */
+      /* Col 1 (Info): Flexible */
+      /* Col 2, 3, 4 (Precios): Fijos para alinear */
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 10px;
+      align-items: stretch;
     }
-    
+
     .estimator-result {
-        text-align: left; display: flex; flex-direction: column; gap: 1px;
-        font-size: 0.8rem; font-weight: 600;
-        background: var(--est-box-bg); /* Variable corregida para fondo */
-        padding: 6px 10px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.05);
-        height: 100%; justify-content: center;
-        color: var(--text);
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: var(--est-box-bg);
+      /* Variable corregida para fondo */
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      height: 100%;
+      justify-content: center;
+      color: var(--text);
     }
-    
+
     .estimator-result.config-box {
-        background: transparent; border: none; padding: 0;
-        display: grid; grid-template-columns: 1fr 1.5fr; gap: 8px;
-        align-items: center;
+      background: transparent;
+      border: none;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 8px;
+      align-items: center;
     }
-    
+
     .config-input-group {
-        display: flex; flex-direction: column; gap: 2px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
     }
-    
+
     .config-info-group {
-        background: var(--est-box-bg); /* Variable corregida para fondo */
-        padding: 5px 8px; border-radius: 4px;
-        border: 1px dashed var(--preview-box-border);
-        height: 100%; display: flex; flex-direction: column; justify-content: center;
+      background: var(--est-box-bg);
+      /* Variable corregida para fondo */
+      padding: 5px 8px;
+      border-radius: 4px;
+      border: 1px dashed var(--preview-box-border);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .estimator-result.total {
-        background: var(--white); border-color: var(--primary); text-align: center;
+      background: var(--white);
+      border-color: var(--primary);
+      text-align: center;
     }
-    
-    .price-tag { font-size: 1.1rem; color: var(--primary); font-weight: 800; line-height: 1.1; }
-    .sub-info { font-size: 0.7rem; color: var(--text-muted); font-weight: normal; }
-    
+
+    .price-tag {
+      font-size: 1.1rem;
+      color: var(--primary);
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .sub-info {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: normal;
+    }
+
     /* Lista de tableros estimados */
-    #estBoardList { font-size: 0.7rem; color: var(--text); font-weight: 600; list-style: none; padding: 0; margin: 0; }
-    #estBoardList li { margin-bottom: 0; padding-bottom: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #estBoardList {
+      font-size: 0.7rem;
+      color: var(--text);
+      font-weight: 600;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #estBoardList li {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     /* PANEL DE FECHA DE ENTREGA */
     #deliveryInfoPanel {
-        display: none; /* Se activa con JS */
-        margin-top: 10px; 
-        background: var(--delivery-bg); 
-        border: 1px solid var(--primary); 
-        padding: 10px; 
-        border-radius: 8px;
-        animation: slideDown 0.3s ease-out;
+      display: none;
+      /* Se activa con JS */
+      margin-top: 10px;
+      background: var(--delivery-bg);
+      border: 1px solid var(--primary);
+      padding: 10px;
+      border-radius: 8px;
+      animation: slideDown 0.3s ease-out;
     }
 
     /* --- TABLA RESPONSIVE --- */
-    .table-responsive { width: 100%; border-collapse: separate; border-spacing: 0; }
-    .table-responsive thead th {
-      background: var(--secondary); color: white; padding: 12px; text-align: left;
-      font-size: 0.85rem; font-weight: 600;
+    .table-responsive {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
     }
-    .table-responsive thead th:first-child { border-top-left-radius: 8px; }
-    .table-responsive thead th:last-child { border-top-right-radius: 8px; }
-    .table-responsive tbody tr { background: var(--white); border-bottom: 1px solid var(--border); }
-    .table-responsive td { padding: 10px; border-bottom: 1px solid var(--border); vertical-align: middle; color: var(--text); }
-    .table-responsive input, .table-responsive select {
-      width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px;
-      font-size: 0.95rem; background: var(--input-bg); color: var(--text);
+
+    .table-responsive thead th {
+      background: var(--secondary);
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .table-responsive thead th:first-child {
+      border-top-left-radius: 8px;
+    }
+
+    .table-responsive thead th:last-child {
+      border-top-right-radius: 8px;
+    }
+
+    .table-responsive tbody tr {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table-responsive td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      color: var(--text);
+    }
+
+    .table-responsive input,
+    .table-responsive select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.95rem;
+      background: var(--input-bg);
+      color: var(--text);
     }
 
     /* --- PREVIEW VISUALIZADOR --- */
-    .canto-wrapper { display: flex; align-items: center; gap: 10px; }
-    .preview-box {
-        width: 36px; height: 24px; background-color: var(--preview-box-bg);
-        border: 1px solid var(--preview-box-border); border-radius: 1px; flex-shrink: 0;
+    .canto-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .preview-box.c-top { border-top: 3px solid var(--canto-color); }
-    .preview-box.c-bottom { border-bottom: 3px solid var(--canto-color); }
-    .preview-box.c-left { border-left: 3px solid var(--canto-color); }
-    .preview-box.c-right { border-right: 3px solid var(--canto-color); }
+
+    .preview-box {
+      width: 36px;
+      height: 24px;
+      background-color: var(--preview-box-bg);
+      border: 1px solid var(--preview-box-border);
+      border-radius: 1px;
+      flex-shrink: 0;
+    }
+
+    .preview-box.c-top {
+      border-top: 3px solid var(--canto-color);
+    }
+
+    .preview-box.c-bottom {
+      border-bottom: 3px solid var(--canto-color);
+    }
+
+    .preview-box.c-left {
+      border-left: 3px solid var(--canto-color);
+    }
+
+    .preview-box.c-right {
+      border-right: 3px solid var(--canto-color);
+    }
 
     .btn-icon {
-      background: none; border: none; cursor: pointer; padding: 5px; border-radius: 4px;
-      display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
     }
-    .btn-delete { color: var(--danger); }
-    .btn-delete:hover { background: rgba(239, 68, 68, 0.1); }
-    .btn-copy { color: var(--text); }
-    .btn-copy:hover { background: rgba(0,0,0,0.05); }
+
+    .btn-delete {
+      color: var(--danger);
+    }
+
+    .btn-delete:hover {
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .btn-copy {
+      color: var(--text);
+    }
+
+    .btn-copy:hover {
+      background: rgba(0, 0, 0, 0.05);
+    }
 
     /* --- BOTONES --- */
-    .action-bar { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: space-between; }
-    .btn {
-      padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
-      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    .action-bar {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: space-between;
     }
-    .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 6px rgba(106, 171, 100, 0.4); }
-    .btn-outline { background: transparent; border: 2px solid var(--secondary); color: var(--secondary); }
-    .btn-danger { background: var(--danger); color: white; }
-    @media (prefers-color-scheme: dark) { .btn-outline { border-color: var(--text); color: var(--text); } }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 6px rgba(106, 171, 100, 0.4);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--secondary);
+      color: var(--secondary);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .btn-outline {
+        border-color: var(--text);
+        color: var(--text);
+      }
+    }
 
     /* Leyenda */
-    .legend-toggle { font-size: 0.85rem; color: var(--primary); cursor: pointer; text-decoration: underline; margin-top: 10px; display: inline-block; }
-    .legend-content { display: none; background: var(--legend-bg); padding: 10px; border-radius: 6px; margin-top: 5px; font-size: 0.8rem; color: var(--text); }
-    .legend-content.show { display: block; }
-    input[readonly] { background: var(--readonly-bg) !important; cursor: not-allowed; }
+    .legend-toggle {
+      font-size: 0.85rem;
+      color: var(--primary);
+      cursor: pointer;
+      text-decoration: underline;
+      margin-top: 10px;
+      display: inline-block;
+    }
+
+    .legend-content {
+      display: none;
+      background: var(--legend-bg);
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 5px;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .legend-content.show {
+      display: block;
+    }
+
+    input[readonly] {
+      background: var(--readonly-bg) !important;
+      cursor: not-allowed;
+    }
 
     /* Mobile */
     @media (max-width: 900px) {
-        .estimator-grid { grid-template-columns: 1fr; gap: 10px; }
-        .estimator-result.config-box { display: flex; flex-direction: column; align-items: stretch; }
-        
-        .table-responsive thead { display: none; }
-        .table-responsive tbody tr { display: block; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 15px; border: 1px solid var(--border); }
-        .table-responsive td { display: flex; justify-content: space-between; align-items: center; border: none; padding: 8px 0; text-align: right; }
-        .table-responsive td::before { content: attr(data-label); font-weight: 700; font-size: 0.85rem; color: var(--text-muted); text-align: left; margin-right: 15px; flex: 1; }
-        .table-responsive td input, .table-responsive td select { width: 60%; }
-        .canto-wrapper { width: 60%; }
-        .stats-bar { flex-direction: column; align-items: flex-start; }
-        .stats-values { width: 100%; justify-content: space-between; font-size: 0.9rem; }
+      .estimator-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .estimator-result.config-box {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .table-responsive thead {
+        display: none;
+      }
+
+      .table-responsive tbody tr {
+        display: block;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        border: 1px solid var(--border);
+      }
+
+      .table-responsive td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: none;
+        padding: 8px 0;
+        text-align: right;
+      }
+
+      .table-responsive td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-align: left;
+        margin-right: 15px;
+        flex: 1;
+      }
+
+      .table-responsive td input,
+      .table-responsive td select {
+        width: 60%;
+      }
+
+      .canto-wrapper {
+        width: 60%;
+      }
+
+      .stats-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .stats-values {
+        width: 100%;
+        justify-content: space-between;
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <div class="container">
-    
+
     <!-- CABECERA -->
     <header class="header">
       <div class="brand">
         <h1>GABARRÓ</h1>
         <p>Centro de Corte y Canteado</p>
       </div>
-      
+
       <div class="order-type">
         <label class="radio-label">
           <input type="radio" name="tipoPedido" value="Pedido" checked onchange="saveData(); updateDeliveryUI()">
@@ -335,84 +744,92 @@
       <!-- Barra Principal -->
       <div class="stats-bar">
         <span><i data-lucide="calculator" style="margin-right: 8px; vertical-align: middle;"></i> Resumen Total</span>
-        
+
         <div class="stats-values">
-            <span id="totalPieces">0 Piezas</span>
-            <span style="opacity: 0.3">|</span>
-            <span id="totalArea">0.00 m²</span>
-            <span style="opacity: 0.3">|</span>
-            <span id="totalCanto" style="color: var(--canto-color);">0.00 ml Canto</span>
-            
-            <!-- Activador Estimador -->
-            <label class="estimator-toggle" title="Activar estimación de costes">
-                <span style="font-size: 0.8rem; font-weight: normal;">Estimador Costes</span>
-                <input type="checkbox" id="estimatorCheck" style="display:none" onchange="toggleEstimator()">
-                <div class="toggle-switch"></div>
-            </label>
+          <span id="totalPieces">0 Piezas</span>
+          <span style="opacity: 0.3">|</span>
+          <span id="totalArea">0.00 m²</span>
+          <span style="opacity: 0.3">|</span>
+          <span id="totalCanto" style="color: var(--canto-color);">0.00 ml Canto</span>
+
+          <!-- Activador Estimador -->
+          <label class="estimator-toggle" title="Activar estimación de costes">
+            <span style="font-size: 0.8rem; font-weight: normal;">Estimador Costes</span>
+            <input type="checkbox" id="estimatorCheck" style="display:none" onchange="toggleEstimator()">
+            <div class="toggle-switch"></div>
+          </label>
         </div>
       </div>
 
       <!-- Panel Fecha de Entrega -->
       <div id="deliveryInfoPanel">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-            <div style="display:flex; align-items:center; gap:8px;">
-                <i data-lucide="truck" style="color:var(--primary);"></i>
-                <div>
-                    <div style="font-weight:700; color:var(--primary); font-size:0.95rem;">FECHA ESTIMADA DE ENTREGA</div>
-                    <div style="font-size:0.75rem; color:var(--text-muted);">Considerando pedido antes de las 15:00h (días hábiles)</div>
-                </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i data-lucide="truck" style="color:var(--primary);"></i>
+            <div>
+              <div style="font-weight:700; color:var(--primary); font-size:0.95rem;">FECHA ESTIMADA DE ENTREGA</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Considerando pedido antes de las 15:00h (días
+                hábiles)</div>
             </div>
-            <div style="text-align:right;">
-                <div id="deliveryDateDisplay" style="font-size:1.2rem; font-weight:800; color:var(--text);">Calculando...</div>
-                <div style="font-size:0.7rem; color:var(--danger); font-weight:600;">*Sujeto a ruta y disponibilidad</div>
+          </div>
+          <div style="text-align:right;">
+            <div id="deliveryDateDisplay" style="font-size:1.2rem; font-weight:800; color:var(--text);">Calculando...
             </div>
+            <div style="font-size:0.7rem; color:var(--danger); font-weight:600;">*Sujeto a ruta y disponibilidad</div>
+          </div>
         </div>
       </div>
 
       <!-- Panel Estimador (Oculto) -->
       <div id="estimatorPanel">
         <div class="estimator-grid">
-            <!-- 1. Configuración y Tableros (Combinado) -->
-            <div class="estimator-result config-box">
-                <div class="config-input-group">
-                    <label style="font-size:0.7rem; color:var(--text-muted)">Medida Tablero Ref.</label>
-                    <select id="boardSizeSelect" onchange="calculateCosts()" style="width: 100%; padding: 4px 6px; border-radius: 4px; border:1px solid var(--border); background: var(--white); color: var(--text); font-size: 0.8rem;">
-                        <option value="2800x2070">2800 x 2070</option>
-                        <option value="2850x2100">2850 x 2100</option>
-                        <option value="2440x1220">2440 x 1220</option>
-                        <option value="2500x1220">2500 x 1220</option>
-                        <option value="2500x1250">2500 x 1250</option>
-                        <option value="3050x1220">3050 x 1220</option>
-                        <option value="3660x2100">3660 x 2100</option>
-                    </select>
-                </div>
-                <div class="config-info-group">
-                    <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:2px;">Tableros Aprox.</div>
-                    <ul id="estBoardList"><li>...</li></ul>
-                </div>
+          <!-- 1. Configuración y Tableros (Combinado) -->
+          <div class="estimator-result config-box">
+            <div class="config-input-group">
+              <label style="font-size:0.7rem; color:var(--text-muted)">Medida Tablero Ref.</label>
+              <select id="boardSizeSelect" onchange="calculateCosts()"
+                style="width: 100%; padding: 4px 6px; border-radius: 4px; border:1px solid var(--border); background: var(--white); color: var(--text); font-size: 0.8rem;">
+                <option value="2800x2070">2800 x 2070</option>
+                <option value="2850x2100">2850 x 2100</option>
+                <option value="2440x1220">2440 x 1220</option>
+                <option value="2500x1220">2500 x 1220</option>
+                <option value="2500x1250">2500 x 1250</option>
+                <option value="3050x1220">3050 x 1220</option>
+                <option value="3660x2100">3660 x 2100</option>
+              </select>
             </div>
+            <div class="config-info-group">
+              <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:2px;">Tableros Aprox.</div>
+              <ul id="estBoardList">
+                <li>...</li>
+              </ul>
+            </div>
+          </div>
 
-            <!-- 2. Coste Corte -->
-            <div class="estimator-result">
-                <span style="font-size:0.75rem; color:var(--text-muted)">Servicio Corte</span>
-                <span class="price-tag" id="estCortePrice">0,00 €</span>
-                <span class="sub-info" id="estCorteInfo">0 min</span>
-            </div>
+          <!-- 2. Coste Corte -->
+          <div class="estimator-result">
+            <span style="font-size:0.75rem; color:var(--text-muted)">Servicio Corte</span>
+            <span class="price-tag" id="estCortePrice">0,00 €</span>
+            <span class="sub-info" id="estCorteInfo">0 min</span>
+            <span class="sub-info" id="estLabelInfo" style="color:var(--danger); display:none;"></span>
+          </div>
 
-            <!-- 3. Coste Canto -->
-            <div class="estimator-result">
-                <span style="font-size:0.75rem; color:var(--text-muted)">Servicio Canteado</span>
-                <span class="price-tag" id="estCantoPrice">0,00 €</span>
-                <span class="sub-info" id="estCantoInfo">0 ml</span>
-            </div>
+          <!-- 3. Coste Canto -->
+          <div class="estimator-result">
+            <span style="font-size:0.75rem; color:var(--text-muted)">Servicio Canteado</span>
+            <span class="price-tag" id="estCantoPrice">0,00 €</span>
+            <span class="sub-info" id="estCantoInfo">0 ml</span>
+          </div>
 
-            <!-- 4. Total -->
-            <div class="estimator-result total">
-                <span style="font-size:0.75rem; font-weight:bold; color:var(--secondary)">TOTAL SERVICIOS</span>
-                <span class="price-tag" style="font-size: 1.4rem;" id="estTotal">0,00 €</span>
-                <span class="sub-info" style="margin-bottom:4px;">+ IVA</span>
-                <span class="sub-info" style="border-top: 1px dashed var(--border); padding-top: 5px; width: 100%; display: block; font-size: 1.1rem; font-weight: 700; color: var(--text);" id="estPricePerMeter">0,00 €/ml</span>
-            </div>
+          <!-- 4. Total -->
+          <div class="estimator-result total">
+            <span style="font-size:0.75rem; font-weight:bold; color:var(--secondary)">TOTAL SERVICIOS</span>
+            <span class="price-tag" style="font-size: 1.4rem;" id="estTotal">0,00 €</span>
+            <span class="sub-info" style="margin-bottom:4px;">+ IVA</span>
+            <span class="sub-info"
+              style="border-top: 1px dashed var(--border); padding-top: 5px; width: 100%; display: block; font-size: 1.1rem; font-weight: 700; color: var(--text);"
+              id="estPricePerMeter">0,00 €/ml</span>
+          </div>
         </div>
       </div>
     </div>
@@ -420,7 +837,9 @@
     <!-- TABLA DE MEDIDAS -->
     <form id="corteForm">
       <div style="text-align: center; color: var(--danger); font-weight: bold; margin-bottom: 10px; font-size: 0.9rem;">
-        ⚠ IMPORTANTE: El LARGO es siempre la dirección de la veta
+        ⚠ IMPORTANTE: El LARGO es siempre la dirección de la veta<br>
+        <span style="font-size: 0.8rem; font-weight: 500;">(Si rellenas la casilla "Referencia", se cobrará el servicio
+          adicional de etiquetado por cada pieza)</span>
       </div>
 
       <table class="table-responsive" id="dataTable">
@@ -442,7 +861,8 @@
       </table>
 
       <!-- BOTÓN AGREGAR -->
-      <button type="button" class="btn btn-outline" id="addRow" style="width: 100%; margin-top: 15px; border-style: dashed; justify-content: center;">
+      <button type="button" class="btn btn-outline" id="addRow"
+        style="width: 100%; margin-top: 15px; border-style: dashed; justify-content: center;">
         <i data-lucide="plus-circle"></i> Añadir Pieza
       </button>
 
@@ -479,243 +899,262 @@
 
     // OPCIONES DE CANTEADO
     const cantosOptions = [
-      {val: "SIN CANTO", label: "SIN CANTO"},
-      {val: "1CL 1CA", label: "1 Largo + 1 Ancho (L)"},
-      {val: "1CL 2CA", label: "1 Largo + 2 Anchos (U)"},
-      {val: "2CL", label: "2 Largos (Paralelos)"},
-      {val: "2CL 1CA", label: "2 Largos + 1 Ancho (U)"},
-      {val: "1CL", label: "1 Largo Único"},
-      {val: "4C", label: "4 Cantos (Perímetro)"},
-      {val: "1CA", label: "1 Ancho Único"},
-      {val: "2CA", label: "2 Anchos (Paralelos)"}
+      { val: "SIN CANTO", label: "SIN CANTO" },
+      { val: "1CL 1CA", label: "1 Largo + 1 Ancho (L)" },
+      { val: "1CL 2CA", label: "1 Largo + 2 Anchos (U)" },
+      { val: "2CL", label: "2 Largos (Paralelos)" },
+      { val: "2CL 1CA", label: "2 Largos + 1 Ancho (U)" },
+      { val: "1CL", label: "1 Largo Único" },
+      { val: "4C", label: "4 Cantos (Perímetro)" },
+      { val: "1CA", label: "1 Ancho Único" },
+      { val: "2CA", label: "2 Anchos (Paralelos)" }
     ];
 
     // CONFIGURACIÓN TARIFAS
     const TARIFF = {
-        corte: {
-            pricePerMin: 1.81,
-            minPrice: 35.00,
-            baseTimePerCycle: 2.0, 
-            timePerBoard: 0.8,
-            timePerLine: 2.0,
-            modulesRule: (thick) => {
-                if (thick < 8) return 9; 
-                if (thick < 10) return 8; 
-                if (thick < 13) return 6; 
-                if (thick < 18) return 5; 
-                if (thick < 22) return 4; 
-                if (thick < 28) return 3; 
-                if (thick < 45) return 2; 
-                return 1; 
-            }
-        },
-        canteado: {
-            pricePerMl: 1.41,
-            minPrice: 35.00,
-            discounts: [
-                { limit: 50, discount: 0 },
-                { limit: 120, discount: 0.20 },
-                { limit: 99999, discount: 0.40 } 
-            ]
+      corte: {
+        pricePerMin: 1.81,
+        minPrice: 35.00,
+        baseTimePerCycle: 2.0,
+        timePerBoard: 0.8,
+        timePerLine: 2.0,
+        modulesRule: (thick) => {
+          if (thick < 8) return 9;
+          if (thick < 10) return 8;
+          if (thick < 13) return 6;
+          if (thick < 18) return 5;
+          if (thick < 22) return 4;
+          if (thick < 28) return 3;
+          if (thick < 45) return 2;
+          return 1;
         }
+      },
+      canteado: {
+        pricePerMl: 1.41,
+        minPrice: 35.00,
+        discounts: [
+          { limit: 50, discount: 0 },
+          { limit: 120, discount: 0.20 },
+          { limit: 99999, discount: 0.40 }
+        ]
+      }
     };
 
     // --- FUNCIONES (DEFINIDAS GLOBALMENTE PARA EVITAR ERRORES DE REFERENCIA) ---
 
     function setCurrentDate() {
-        const d = new Date();
-        const dateStr = `${d.getDate().toString().padStart(2,'0')}/${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getFullYear()}`;
-        const fechaInput = document.getElementById("fecha");
-        if(fechaInput) fechaInput.value = dateStr;
+      const d = new Date();
+      const dateStr = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth() + 1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+      const fechaInput = document.getElementById("fecha");
+      if (fechaInput) fechaInput.value = dateStr;
     }
 
     function calculateDeliveryDate() {
-        const now = new Date();
-        const cutoffHour = 15;
-        let effectiveDate = new Date(now);
+      const now = new Date();
+      const cutoffHour = 15;
+      let effectiveDate = new Date(now);
 
-        if (now.getHours() >= cutoffHour) {
-            effectiveDate.setDate(effectiveDate.getDate() + 1);
-        }
+      if (now.getHours() >= cutoffHour) {
+        effectiveDate.setDate(effectiveDate.getDate() + 1);
+      }
 
-        while (effectiveDate.getDay() === 0 || effectiveDate.getDay() === 6) {
-            effectiveDate.setDate(effectiveDate.getDate() + 1);
-        }
+      while (effectiveDate.getDay() === 0 || effectiveDate.getDay() === 6) {
+        effectiveDate.setDate(effectiveDate.getDate() + 1);
+      }
 
-        let workingDaysCount = 0;
-        let productionDate = new Date(effectiveDate);
-        
-        while (workingDaysCount < 4) {
-             productionDate.setDate(productionDate.getDate() + 1);
-             if (productionDate.getDay() !== 0 && productionDate.getDay() !== 6) {
-                 workingDaysCount++;
-             }
-        }
-        
-        let loadDate = new Date(productionDate);
-        while (loadDate.getDay() === 0 || loadDate.getDay() === 6) {
-            loadDate.setDate(loadDate.getDate() + 1);
-        }
+      let workingDaysCount = 0;
+      let productionDate = new Date(effectiveDate);
 
-        while (true) {
-            const day = loadDate.getDay();
-            if (day === 1 || day === 3) { 
-                break;
-            }
-            loadDate.setDate(loadDate.getDate() + 1);
+      while (workingDaysCount < 4) {
+        productionDate.setDate(productionDate.getDate() + 1);
+        if (productionDate.getDay() !== 0 && productionDate.getDay() !== 6) {
+          workingDaysCount++;
         }
+      }
 
-        let deliveryStart = new Date(loadDate);
-        let deliveryEnd = new Date(loadDate);
-        
-        if (loadDate.getDay() === 1) { 
-            deliveryStart.setDate(loadDate.getDate() + 3);
-            deliveryEnd.setDate(loadDate.getDate() + 4);
-        } else { 
-            deliveryStart.setDate(loadDate.getDate() + 5);
-            deliveryEnd.setDate(loadDate.getDate() + 6);
+      let loadDate = new Date(productionDate);
+      while (loadDate.getDay() === 0 || loadDate.getDay() === 6) {
+        loadDate.setDate(loadDate.getDate() + 1);
+      }
+
+      while (true) {
+        const day = loadDate.getDay();
+        if (day === 1 || day === 3) {
+          break;
         }
+        loadDate.setDate(loadDate.getDate() + 1);
+      }
 
-        const options = { day: 'numeric', month: 'long' };
-        return `${deliveryStart.toLocaleDateString('es-ES', options)} - ${deliveryEnd.toLocaleDateString('es-ES', options)}`;
+      let deliveryStart = new Date(loadDate);
+      let deliveryEnd = new Date(loadDate);
+
+      if (loadDate.getDay() === 1) {
+        deliveryStart.setDate(loadDate.getDate() + 3);
+        deliveryEnd.setDate(loadDate.getDate() + 4);
+      } else {
+        deliveryStart.setDate(loadDate.getDate() + 5);
+        deliveryEnd.setDate(loadDate.getDate() + 6);
+      }
+
+      const options = { day: 'numeric', month: 'long' };
+      return `${deliveryStart.toLocaleDateString('es-ES', options)} - ${deliveryEnd.toLocaleDateString('es-ES', options)}`;
     }
 
-    window.updateDeliveryUI = function() {
-        const typeEl = document.querySelector('input[name="tipoPedido"]:checked');
-        if(!typeEl) return;
-        
-        const type = typeEl.value;
-        const panel = document.getElementById("deliveryInfoPanel");
-        
-        if (type === "Pedido") {
-            panel.style.display = "block";
-            const dateRange = calculateDeliveryDate();
-            document.getElementById("deliveryDateDisplay").textContent = dateRange;
-        } else {
-            panel.style.display = "none";
-        }
+    window.updateDeliveryUI = function () {
+      const typeEl = document.querySelector('input[name="tipoPedido"]:checked');
+      if (!typeEl) return;
+
+      const type = typeEl.value;
+      const panel = document.getElementById("deliveryInfoPanel");
+
+      if (type === "Pedido") {
+        panel.style.display = "block";
+        const dateRange = calculateDeliveryDate();
+        document.getElementById("deliveryDateDisplay").textContent = dateRange;
+      } else {
+        panel.style.display = "none";
+      }
     }
 
-    window.toggleEstimator = function() {
-        const panel = document.getElementById("estimatorPanel");
-        const isChecked = document.getElementById("estimatorCheck").checked;
-        panel.style.display = isChecked ? "block" : "none";
-        if(isChecked) calculateCosts();
-        window.saveData(); 
+    window.toggleEstimator = function () {
+      const panel = document.getElementById("estimatorPanel");
+      const isChecked = document.getElementById("estimatorCheck").checked;
+      panel.style.display = isChecked ? "block" : "none";
+      if (isChecked) calculateCosts();
+      window.saveData();
     }
 
     function getGeometricYield(boardL, boardW, pieceL, pieceW) {
-        const fitL_A = Math.floor(boardL / pieceL);
-        const fitW_A = Math.floor(boardW / pieceW);
-        const totalA = fitL_A * fitW_A;
+      const fitL_A = Math.floor(boardL / pieceL);
+      const fitW_A = Math.floor(boardW / pieceW);
+      const totalA = fitL_A * fitW_A;
 
-        const fitL_B = Math.floor(boardL / pieceW);
-        const fitW_B = Math.floor(boardW / pieceL);
-        const totalB = fitL_B * fitW_B;
+      const fitL_B = Math.floor(boardL / pieceW);
+      const fitW_B = Math.floor(boardW / pieceL);
+      const totalB = fitL_B * fitW_B;
 
-        return Math.max(totalA, totalB);
+      return Math.max(totalA, totalB);
     }
 
-    window.calculateCosts = function() {
-        if(!document.getElementById("estimatorCheck").checked) return;
+    window.calculateCosts = function () {
+      if (!document.getElementById("estimatorCheck").checked) return;
 
-        let totalMinutes = 0;
-        let totalEdgingMeters = 0;
-        let totalPerimeter = 0; 
-        let boardGroups = {}; 
-        let totalLines = 0;
+      let totalMinutes = 0;
+      let totalEdgingMeters = 0;
+      let totalPerimeter = 0;
+      let boardGroups = {};
+      let totalLines = 0;
+      let totalLabelMinutes = 0;
 
-        const boardSizeStr = document.getElementById("boardSizeSelect").value;
-        const [bL, bW] = boardSizeStr.split("x").map(Number);
-        
-        const rows = tableBody.querySelectorAll("tr");
-        rows.forEach(row => {
-            const uds = parseInt(row.querySelector(".input-uds").value) || 0;
-            if(uds === 0) return;
-            totalLines++; 
+      const boardSizeStr = document.getElementById("boardSizeSelect").value;
+      const [bL, bW] = boardSizeStr.split("x").map(Number);
 
-            const mat = row.querySelector(".input-mat").value.toUpperCase() || "GENÉRICO";
-            const thick = parseInt(row.querySelector(".input-grueso").value) || 19;
-            const largoMm = parseFloat(row.querySelector(".input-largo").value) || 0;
-            const anchoMm = parseFloat(row.querySelector(".input-ancho").value) || 0;
-            
-            const largoM = largoMm / 1000;
-            const anchoM = anchoMm / 1000;
+      const rows = tableBody.querySelectorAll("tr");
+      rows.forEach(row => {
+        const uds = parseInt(row.querySelector(".input-uds").value) || 0;
+        if (uds === 0) return;
+        totalLines++;
 
-            const piecePerimeter = (largoM + anchoM) * 2;
-            totalPerimeter += (piecePerimeter * uds);
+        const mat = row.querySelector(".input-mat").value.toUpperCase() || "GENÉRICO";
+        const thick = parseInt(row.querySelector(".input-grueso").value) || 19;
+        const largoMm = parseFloat(row.querySelector(".input-largo").value) || 0;
+        const anchoMm = parseFloat(row.querySelector(".input-ancho").value) || 0;
 
-            const groupKey = `${mat}|${thick}`;
-            if(!boardGroups[groupKey]) boardGroups[groupKey] = 0;
-            
-            const piecesPerBoard = getGeometricYield(bL, bW, largoMm, anchoMm);
-            
-            let fractionBoards = 0;
-            if (piecesPerBoard > 0) {
-                fractionBoards = uds / piecesPerBoard;
-                boardGroups[groupKey] += fractionBoards;
-            }
+        const largoM = largoMm / 1000;
+        const anchoM = anchoMm / 1000;
 
-            const stackHeight = TARIFF.corte.modulesRule(thick);
-            const physicalBoards = Math.ceil(fractionBoards > 0 ? fractionBoards : 0);
-            const cycles = Math.ceil(physicalBoards / stackHeight);
-            
-            const lineTime = (cycles * TARIFF.corte.baseTimePerCycle) + (physicalBoards * TARIFF.corte.timePerBoard);
-            totalMinutes += lineTime;
+        const piecePerimeter = (largoM + anchoM) * 2;
+        totalPerimeter += (piecePerimeter * uds);
 
-            const cantoType = row.querySelector(".input-canto").value;
-            let ml = 0;
-            if(cantoType.includes("4C")) ml = (largoM+anchoM)*2;
-            else if(cantoType !== "SIN CANTO" && cantoType !== "") {
-                if(cantoType.includes("CL")) ml += largoM * (cantoType.includes("2CL") ? 2 : 1);
-                if(cantoType.includes("CA")) ml += anchoM * (cantoType.includes("2CA") ? 2 : 1);
-            }
-            totalEdgingMeters += (ml * uds);
-        });
+        const groupKey = `${mat}|${thick}`;
+        if (!boardGroups[groupKey]) boardGroups[groupKey] = 0;
 
-        totalMinutes += (totalLines * TARIFF.corte.timePerLine);
+        const piecesPerBoard = getGeometricYield(bL, bW, largoMm, anchoMm);
 
-        const boardListEl = document.getElementById("estBoardList");
-        boardListEl.innerHTML = "";
-        let hasBoards = false;
-        
-        for (const [key, totalFraction] of Object.entries(boardGroups)) {
-            const [mat, thick] = key.split("|");
-            const count = Math.ceil(totalFraction);
-            const li = document.createElement("li");
-            li.innerHTML = `<strong>${count}</strong> de ${bL} x ${bW} x ${thick} mm`;
-            boardListEl.appendChild(li);
-            hasBoards = true;
+        let fractionBoards = 0;
+        if (piecesPerBoard > 0) {
+          fractionBoards = uds / piecesPerBoard;
+          boardGroups[groupKey] += fractionBoards;
         }
-        if(!hasBoards) boardListEl.innerHTML = "<li>Añade medidas...</li>";
 
-        let cortePrice = totalMinutes * TARIFF.corte.pricePerMin;
-        if (cortePrice < TARIFF.corte.minPrice && cortePrice > 0) cortePrice = TARIFF.corte.minPrice;
-        if (totalMinutes === 0) cortePrice = 0;
+        const stackHeight = TARIFF.corte.modulesRule(thick);
+        const physicalBoards = Math.ceil(fractionBoards > 0 ? fractionBoards : 0);
+        const cycles = Math.ceil(physicalBoards / stackHeight);
 
-        const roundedEdgingMeters = Math.ceil(totalEdgingMeters); 
-        let discount = 0;
-        if (roundedEdgingMeters >= 120) discount = 0.40;
-        else if (roundedEdgingMeters >= 50) discount = 0.20;
+        let lineTime = (cycles * TARIFF.corte.baseTimePerCycle) + (physicalBoards * TARIFF.corte.timePerBoard);
 
-        let cantoGrossPrice = roundedEdgingMeters * TARIFF.canteado.pricePerMl;
-        let cantoNetPrice = cantoGrossPrice * (1 - discount);
-        if (cantoNetPrice < TARIFF.canteado.minPrice && cantoNetPrice > 0) cantoNetPrice = TARIFF.canteado.minPrice;
-        if (roundedEdgingMeters === 0) cantoNetPrice = 0;
+        // Lógica de Etiquetas (Referencia)
+        const refText = row.querySelector(".input-ref").value.trim();
+        if (refText !== "") {
+          const labelTimeForPieces = uds * 0.925; // 0.925 mins extra por pieza etiquetada
+          lineTime += labelTimeForPieces;
+          totalLabelMinutes += labelTimeForPieces;
+        }
 
-        let unitCorte = totalPerimeter > 0 ? (cortePrice / totalPerimeter) : 0;
-        let unitCanto = roundedEdgingMeters > 0 ? (cantoNetPrice / roundedEdgingMeters) : 0;
-        let pricePerLinealMeter = unitCorte + unitCanto;
+        totalMinutes += lineTime;
 
-        document.getElementById("estCortePrice").textContent = cortePrice.toFixed(2) + " €";
-        document.getElementById("estCorteInfo").textContent = `${totalMinutes.toFixed(0)} min`;
-        
-        document.getElementById("estCantoPrice").textContent = cantoNetPrice.toFixed(2) + " €";
-        document.getElementById("estCantoInfo").textContent = `${roundedEdgingMeters} ml (Dto. ${(discount*100).toFixed(0)}%)`;
+        const cantoType = row.querySelector(".input-canto").value;
+        let ml = 0;
+        if (cantoType.includes("4C")) ml = (largoM + anchoM) * 2;
+        else if (cantoType !== "SIN CANTO" && cantoType !== "") {
+          if (cantoType.includes("CL")) ml += largoM * (cantoType.includes("2CL") ? 2 : 1);
+          if (cantoType.includes("CA")) ml += anchoM * (cantoType.includes("2CA") ? 2 : 1);
+        }
+        totalEdgingMeters += (ml * uds);
+      });
 
-        const grandTotal = cortePrice + cantoNetPrice;
-        document.getElementById("estTotal").textContent = grandTotal.toFixed(2) + " €";
-        document.getElementById("estPricePerMeter").textContent = pricePerLinealMeter.toFixed(2) + " €/ml";
+      totalMinutes += (totalLines * TARIFF.corte.timePerLine);
+
+      const boardListEl = document.getElementById("estBoardList");
+      boardListEl.innerHTML = "";
+      let hasBoards = false;
+
+      for (const [key, totalFraction] of Object.entries(boardGroups)) {
+        const [mat, thick] = key.split("|");
+        const count = Math.ceil(totalFraction);
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${count}</strong> de ${bL} x ${bW} x ${thick} mm`;
+        boardListEl.appendChild(li);
+        hasBoards = true;
+      }
+      if (!hasBoards) boardListEl.innerHTML = "<li>Añade medidas...</li>";
+
+      let cortePrice = totalMinutes * TARIFF.corte.pricePerMin;
+      if (cortePrice < TARIFF.corte.minPrice && cortePrice > 0) cortePrice = TARIFF.corte.minPrice;
+      if (totalMinutes === 0) cortePrice = 0;
+
+      const roundedEdgingMeters = Math.ceil(totalEdgingMeters);
+      let discount = 0;
+      if (roundedEdgingMeters >= 120) discount = 0.40;
+      else if (roundedEdgingMeters >= 50) discount = 0.20;
+
+      let cantoGrossPrice = roundedEdgingMeters * TARIFF.canteado.pricePerMl;
+      let cantoNetPrice = cantoGrossPrice * (1 - discount);
+      if (cantoNetPrice < TARIFF.canteado.minPrice && cantoNetPrice > 0) cantoNetPrice = TARIFF.canteado.minPrice;
+      if (roundedEdgingMeters === 0) cantoNetPrice = 0;
+
+      let unitCorte = totalPerimeter > 0 ? (cortePrice / totalPerimeter) : 0;
+      let unitCanto = roundedEdgingMeters > 0 ? (cantoNetPrice / roundedEdgingMeters) : 0;
+      let pricePerLinealMeter = unitCorte + unitCanto;
+
+      document.getElementById("estCortePrice").textContent = cortePrice.toFixed(2) + " €";
+      document.getElementById("estCorteInfo").textContent = `${totalMinutes.toFixed(0)} min`;
+
+      const labelInfoEl = document.getElementById("estLabelInfo");
+      if (totalLabelMinutes > 0) {
+        const labelCost = totalLabelMinutes * TARIFF.corte.pricePerMin;
+        labelInfoEl.textContent = `(+ ${labelCost.toFixed(2)} € de etiquetas)`;
+        labelInfoEl.style.display = "block";
+      } else {
+        labelInfoEl.style.display = "none";
+      }
+
+      document.getElementById("estCantoPrice").textContent = cantoNetPrice.toFixed(2) + " €";
+      document.getElementById("estCantoInfo").textContent = `${roundedEdgingMeters} ml (Dto. ${(discount * 100).toFixed(0)}%)`;
+
+      const grandTotal = cortePrice + cantoNetPrice;
+      document.getElementById("estTotal").textContent = grandTotal.toFixed(2) + " €";
+      document.getElementById("estPricePerMeter").textContent = pricePerLinealMeter.toFixed(2) + " €/ml";
     }
 
     function updateStats() {
@@ -729,17 +1168,17 @@
 
         totalP += uds;
         totalM2 += (largo * ancho) * uds;
-        
+
         let mlPerPiece = 0;
-        if(cantoType === "1CL 1CA") mlPerPiece = largo + ancho;
-        else if(cantoType === "1CL 2CA") mlPerPiece = largo + (ancho * 2);
-        else if(cantoType === "2CL") mlPerPiece = largo * 2;
-        else if(cantoType === "2CL 1CA") mlPerPiece = (largo * 2) + ancho;
-        else if(cantoType === "1CL") mlPerPiece = largo;
-        else if(cantoType === "4C") mlPerPiece = (largo * 2) + (ancho * 2);
-        else if(cantoType === "1CA") mlPerPiece = ancho;
-        else if(cantoType === "2CA") mlPerPiece = ancho * 2;
-        
+        if (cantoType === "1CL 1CA") mlPerPiece = largo + ancho;
+        else if (cantoType === "1CL 2CA") mlPerPiece = largo + (ancho * 2);
+        else if (cantoType === "2CL") mlPerPiece = largo * 2;
+        else if (cantoType === "2CL 1CA") mlPerPiece = (largo * 2) + ancho;
+        else if (cantoType === "1CL") mlPerPiece = largo;
+        else if (cantoType === "4C") mlPerPiece = (largo * 2) + (ancho * 2);
+        else if (cantoType === "1CA") mlPerPiece = ancho;
+        else if (cantoType === "2CA") mlPerPiece = ancho * 2;
+
         totalML += mlPerPiece * uds;
       });
 
@@ -749,88 +1188,88 @@
     }
 
     // Funciones de utilidad UI
-    window.updatePreviewBox = function(select) {
-        const val = select.value;
-        const box = select.nextElementSibling;
-        box.className = 'preview-box';
-        if (val.includes("4C")) box.classList.add("c-top", "c-bottom", "c-left", "c-right");
-        else if (val !== "SIN CANTO") {
-            if (val.includes("2CL")) box.classList.add("c-top", "c-bottom");
-            else if (val.includes("1CL")) box.classList.add("c-top");
-            if (val.includes("2CA")) box.classList.add("c-left", "c-right");
-            else if (val.includes("1CA")) box.classList.add("c-right");
-        }
+    window.updatePreviewBox = function (select) {
+      const val = select.value;
+      const box = select.nextElementSibling;
+      box.className = 'preview-box';
+      if (val.includes("4C")) box.classList.add("c-top", "c-bottom", "c-left", "c-right");
+      else if (val !== "SIN CANTO") {
+        if (val.includes("2CL")) box.classList.add("c-top", "c-bottom");
+        else if (val.includes("1CL")) box.classList.add("c-top");
+        if (val.includes("2CA")) box.classList.add("c-left", "c-right");
+        else if (val.includes("1CA")) box.classList.add("c-right");
+      }
     }
 
     // Funciones vinculadas a eventos HTML (excluyendo las que requieren parámetros de evento)
-    window.saveAndRecalc = function() {
-        window.saveData();
-        updateStats();
-        window.calculateCosts(); 
+    window.saveAndRecalc = function () {
+      window.saveData();
+      updateStats();
+      window.calculateCosts();
     }
 
-    window.saveData = function() {
-        const formData = {
-            nombre: document.getElementById("nombre").value,
-            email: document.getElementById("email").value,
-            telefono: document.getElementById("telefono").value,
-            codigo: document.getElementById("codigoCliente").value,
-            tipo: document.querySelector('input[name="tipoPedido"]:checked').value,
-            estimatorActive: document.getElementById("estimatorCheck").checked, 
-            boardSize: document.getElementById("boardSizeSelect").value,
-            items: []
-        };
-        const rows = tableBody.querySelectorAll("tr");
-        rows.forEach(row => {
-            formData.items.push({
-                canteado: row.querySelector(".input-canto").value,
-                referencia: row.querySelector(".input-ref").value,
-                material: row.querySelector(".input-mat").value,
-                grueso: row.querySelector(".input-grueso").value,
-                largo: row.querySelector(".input-largo").value,
-                ancho: row.querySelector(".input-ancho").value,
-                unidades: row.querySelector(".input-uds").value
-            });
+    window.saveData = function () {
+      const formData = {
+        nombre: document.getElementById("nombre").value,
+        email: document.getElementById("email").value,
+        telefono: document.getElementById("telefono").value,
+        codigo: document.getElementById("codigoCliente").value,
+        tipo: document.querySelector('input[name="tipoPedido"]:checked').value,
+        estimatorActive: document.getElementById("estimatorCheck").checked,
+        boardSize: document.getElementById("boardSizeSelect").value,
+        items: []
+      };
+      const rows = tableBody.querySelectorAll("tr");
+      rows.forEach(row => {
+        formData.items.push({
+          canteado: row.querySelector(".input-canto").value,
+          referencia: row.querySelector(".input-ref").value,
+          material: row.querySelector(".input-mat").value,
+          grueso: row.querySelector(".input-grueso").value,
+          largo: row.querySelector(".input-largo").value,
+          ancho: row.querySelector(".input-ancho").value,
+          unidades: row.querySelector(".input-uds").value
         });
-        localStorage.setItem("gabarroDataEstimator", JSON.stringify(formData));
+      });
+      localStorage.setItem("gabarroDataEstimator", JSON.stringify(formData));
     };
 
     function loadData() {
-        const saved = localStorage.getItem("gabarroDataEstimator");
-        if(saved) {
-            try {
-                const data = JSON.parse(saved);
-                document.getElementById("nombre").value = data.nombre || "";
-                document.getElementById("email").value = data.email || "";
-                document.getElementById("telefono").value = data.telefono || "";
-                document.getElementById("codigoCliente").value = data.codigo || "";
-                if(data.tipo) {
-                    const radio = document.querySelector(`input[name="tipoPedido"][value="${data.tipo}"]`);
-                    if(radio) radio.checked = true;
-                }
-                if(data.estimatorActive) {
-                    document.getElementById("estimatorCheck").checked = true;
-                    document.getElementById("estimatorPanel").style.display = "block";
-                }
-                if(data.boardSize) document.getElementById("boardSizeSelect").value = data.boardSize;
+      const saved = localStorage.getItem("gabarroDataEstimator");
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          document.getElementById("nombre").value = data.nombre || "";
+          document.getElementById("email").value = data.email || "";
+          document.getElementById("telefono").value = data.telefono || "";
+          document.getElementById("codigoCliente").value = data.codigo || "";
+          if (data.tipo) {
+            const radio = document.querySelector(`input[name="tipoPedido"][value="${data.tipo}"]`);
+            if (radio) radio.checked = true;
+          }
+          if (data.estimatorActive) {
+            document.getElementById("estimatorCheck").checked = true;
+            document.getElementById("estimatorPanel").style.display = "block";
+          }
+          if (data.boardSize) document.getElementById("boardSizeSelect").value = data.boardSize;
 
-                if(data.items && data.items.length > 0) {
-                    tableBody.innerHTML = "";
-                    data.items.forEach(item => window.addNewRow(item));
-                }
-            } catch(e) { console.error("Error cargando datos", e); }
-        }
+          if (data.items && data.items.length > 0) {
+            tableBody.innerHTML = "";
+            data.items.forEach(item => window.addNewRow(item));
+          }
+        } catch (e) { console.error("Error cargando datos", e); }
+      }
     }
 
-    window.createRowHTML = function(data = {}) {
-        const row = document.createElement("tr");
-        let optionsHTML = `<option value="">- Selec -</option>`;
-        cantosOptions.forEach(opt => {
-            const selected = (data.canteado === opt.val) ? 'selected' : '';
-            optionsHTML += `<option value="${opt.val}" ${selected}>${opt.val}</option>`;
-        });
+    window.createRowHTML = function (data = {}) {
+      const row = document.createElement("tr");
+      let optionsHTML = `<option value="">- Selec -</option>`;
+      cantosOptions.forEach(opt => {
+        const selected = (data.canteado === opt.val) ? 'selected' : '';
+        optionsHTML += `<option value="${opt.val}" ${selected}>${opt.val}</option>`;
+      });
 
-        row.innerHTML = `
+      row.innerHTML = `
           <td data-label="Canteado">
             <div class="canto-wrapper">
                 <select class="input-canto" onchange="window.updatePreviewBox(this); window.saveAndRecalc();">${optionsHTML}</select>
@@ -838,7 +1277,7 @@
             </div>
           </td>
           <td data-label="Referencia">
-            <input type="text" class="input-ref" value="${data.referencia || ''}" placeholder="Ej. Puerta" oninput="window.saveData()">
+            <input type="text" class="input-ref" value="${data.referencia || ''}" placeholder="Ej. Puerta" oninput="window.saveAndRecalc()">
           </td>
           <td data-label="Material">
             <input type="text" class="input-mat" value="${data.material || ''}" placeholder="Tipo tablero" oninput="window.saveData()">
@@ -866,25 +1305,25 @@
             </div>
           </td>
         `;
-        setTimeout(() => window.updatePreviewBox(row.querySelector('.input-canto')), 0);
-        return row;
+      setTimeout(() => window.updatePreviewBox(row.querySelector('.input-canto')), 0);
+      return row;
     }
 
-    window.addNewRow = function(data = {}) {
+    window.addNewRow = function (data = {}) {
       if (Object.keys(data).length === 0) {
         const lastRow = tableBody.lastElementChild;
         if (lastRow) {
-            data.material = lastRow.querySelector(".input-mat").value;
-            data.grueso = lastRow.querySelector(".input-grueso").value;
+          data.material = lastRow.querySelector(".input-mat").value;
+          data.grueso = lastRow.querySelector(".input-grueso").value;
         }
       }
       const row = window.createRowHTML(data);
       tableBody.appendChild(row);
-      if(typeof lucide !== 'undefined') lucide.createIcons();
+      if (typeof lucide !== 'undefined') lucide.createIcons();
       window.saveAndRecalc();
     }
 
-    window.duplicateRow = function(btn) {
+    window.duplicateRow = function (btn) {
       const tr = btn.closest("tr");
       const data = {
         canteado: tr.querySelector(".input-canto").value,
@@ -898,75 +1337,75 @@
       window.addNewRow(data);
     };
 
-    window.deleteRow = function(btn) {
-        btn.closest("tr").remove();
-        window.saveAndRecalc();
+    window.deleteRow = function (btn) {
+      btn.closest("tr").remove();
+      window.saveAndRecalc();
     };
 
-    window.downloadExcel = function() {
-        const nombre = document.getElementById("nombre").value.trim();
-        const rows = tableBody.querySelectorAll("tr");
-        
-        let hasData = false;
-        rows.forEach(row => { if(row.querySelector(".input-mat").value || (row.querySelector(".input-largo").value && row.querySelector(".input-ancho").value)) hasData = true; });
-        if(!hasData) { alert("Tabla vacía."); return; }
-        if (!nombre) { alert("Indica el Nombre."); return; }
+    window.downloadExcel = function () {
+      const nombre = document.getElementById("nombre").value.trim();
+      const rows = tableBody.querySelectorAll("tr");
 
-        const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
-        const dataRows = [
-            ["FORMULARIO GABARRÓ", ""],
-            ["Tipo:", tipo],
-            ["Cliente:", nombre],
-            ["Teléfono:", document.getElementById("telefono").value],
-            [],
-            ["Canteado", "Ref", "Material", "Grueso", "Largo", "Ancho", "Uds"]
-        ];
+      let hasData = false;
+      rows.forEach(row => { if (row.querySelector(".input-mat").value || (row.querySelector(".input-largo").value && row.querySelector(".input-ancho").value)) hasData = true; });
+      if (!hasData) { alert("Tabla vacía."); return; }
+      if (!nombre) { alert("Indica el Nombre."); return; }
 
-        rows.forEach(row => {
-            dataRows.push([
-                row.querySelector(".input-canto").value,
-                row.querySelector(".input-ref").value,
-                row.querySelector(".input-mat").value,
-                row.querySelector(".input-grueso").value,
-                row.querySelector(".input-largo").value,
-                row.querySelector(".input-ancho").value,
-                row.querySelector(".input-uds").value
-            ]);
-        });
-        
-        // Eliminada la sección de estimaciones del Excel a petición del usuario
+      const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
+      const dataRows = [
+        ["FORMULARIO GABARRÓ", ""],
+        ["Tipo:", tipo],
+        ["Cliente:", nombre],
+        ["Teléfono:", document.getElementById("telefono").value],
+        [],
+        ["Canteado", "Ref", "Material", "Grueso", "Largo", "Ancho", "Uds"]
+      ];
 
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(dataRows);
-        ws['!cols'] = [ {wch:15}, {wch:25}, {wch:30}, {wch:8}, {wch:10}, {wch:10}, {wch:8} ];
-        XLSX.utils.book_append_sheet(wb, ws, "Produccion");
-        XLSX.writeFile(wb, `Gabarro_${nombre.replace(/ /g,'_')}.xlsx`);
+      rows.forEach(row => {
+        dataRows.push([
+          row.querySelector(".input-canto").value,
+          row.querySelector(".input-ref").value,
+          row.querySelector(".input-mat").value,
+          row.querySelector(".input-grueso").value,
+          row.querySelector(".input-largo").value,
+          row.querySelector(".input-ancho").value,
+          row.querySelector(".input-uds").value
+        ]);
+      });
+
+      // Eliminada la sección de estimaciones del Excel a petición del usuario
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(dataRows);
+      ws['!cols'] = [{ wch: 15 }, { wch: 25 }, { wch: 30 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 8 }];
+      XLSX.utils.book_append_sheet(wb, ws, "Produccion");
+      XLSX.writeFile(wb, `Gabarro_${nombre.replace(/ /g, '_')}.xlsx`);
     }
 
     // --- EVENTOS DE CARGA ---
     document.addEventListener("DOMContentLoaded", function () {
-      if(typeof lucide !== 'undefined') {
+      if (typeof lucide !== 'undefined') {
         lucide.createIcons();
       }
-      
+
       // ESTABLECER FECHA ACTUAL SIEMPRE AL INICIO
       setCurrentDate();
 
       // Cargar datos guardados (esto puede sobreescribir otros campos, pero no la fecha si no se guarda)
       loadData();
-      
-      if(tableBody.children.length === 0) window.addNewRow();
-      
+
+      if (tableBody.children.length === 0) window.addNewRow();
+
       updateStats();
-      window.updateDeliveryUI(); 
+      window.updateDeliveryUI();
     });
 
     // Event listeners para botones estáticos
     document.getElementById("addRow").addEventListener("click", () => window.addNewRow());
-    document.getElementById("clearTableBtn").addEventListener("click", function() {
-      if(confirm("¿Estás seguro de vaciar toda la tabla?")) {
+    document.getElementById("clearTableBtn").addEventListener("click", function () {
+      if (confirm("¿Estás seguro de vaciar toda la tabla?")) {
         tableBody.innerHTML = "";
-        window.addNewRow(); 
+        window.addNewRow();
         localStorage.removeItem("gabarroDataEstimator");
         window.saveAndRecalc();
       }
@@ -974,4 +1413,5 @@
 
   </script>
 </body>
+
 </html>
