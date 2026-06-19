@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Plantilla Production Gabarró + Estimador</title>
+  <title>Plantilla Producción Gabarró + Estimador</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
@@ -74,7 +74,8 @@
     }
 
     .container {
-      max-width: 1200px;
+      max-width: 1500px; /* Ampliado de 1200px a 1500px para mayor ancho en escritorio */
+      width: 100%;
       margin: 0 auto;
       padding: 20px;
     }
@@ -181,32 +182,22 @@
         /* Fuerza una sola línea */
       }
 
-      /* Asignación de espacios relativos */
+      /* Asignación de espacios relativos proporcionales para que todo estire armónicamente */
       .fg-name {
         flex: 3;
       }
-
-      /* Más espacio para nombre */
       .fg-email {
-        flex: 2.2;
+        flex: 2.5;
       }
-
-      /* Espacio ajustado para email */
       .fg-tel {
+        flex: 1.5;
+      }
+      .fg-code {
         flex: 1.2;
       }
-
-      /* Reducido para teléfono (9 dígitos) */
-      .fg-code {
-        flex: 0 0 140px;
-      }
-
-      /* Ancho fijo ampliado para "Código Cliente" */
       .fg-date {
-        flex: 0 0 110px;
+        flex: 1;
       }
-
-      /* Ancho fijo pequeño para fecha */
     }
 
     .form-group label {
@@ -337,8 +328,6 @@
     .estimator-grid {
       display: grid;
       /* GRID DE UNA SOLA FILA COMPACTA */
-      /* Col 1 (Info): Flexible */
-      /* Col 2, 3, 4 (Precios): Fijos para alinear */
       grid-template-columns: 2fr 1fr 1fr 1fr;
       gap: 10px;
       align-items: stretch;
@@ -352,7 +341,6 @@
       font-size: 0.8rem;
       font-weight: 600;
       background: var(--est-box-bg);
-      /* Variable corregida para fondo */
       padding: 6px 10px;
       border-radius: 6px;
       border: 1px solid rgba(0, 0, 0, 0.05);
@@ -379,7 +367,6 @@
 
     .config-info-group {
       background: var(--est-box-bg);
-      /* Variable corregida para fondo */
       padding: 5px 8px;
       border-radius: 4px;
       border: 1px dashed var(--preview-box-border);
@@ -876,7 +863,6 @@
     const totalAreaEl = document.getElementById("totalArea");
     const totalCantoEl = document.getElementById("totalCanto");
 
-    // OPCIONES DE CANTEADO
     const cantosOptions = [
       { val: "SIN CANTO", label: "SIN CANTO" },
       { val: "1CL 1CA", label: "1 Largo + 1 Ancho (L)" },
@@ -889,7 +875,6 @@
       { val: "2CA", label: "2 Anchos (Paralelos)" }
     ];
 
-    // CONFIGURACIÓN TARIFAS
     const TARIFF = {
       corte: {
         pricePerMin: 1.81,
@@ -1062,7 +1047,6 @@
 
         let lineTime = (cycles * TARIFF.corte.baseTimePerCycle) + (physicalBoards * TARIFF.corte.timePerBoard);
 
-        // Lógica de Etiquetas (Referencia)
         const refText = row.querySelector(".input-ref").value.trim();
         if (refText !== "") {
           const labelTimeForPieces = uds * 0.925;
@@ -1336,7 +1320,6 @@
       const codigoCliente = document.getElementById("codigoCliente").value.trim();
       const fecha = document.getElementById("fecha").value;
 
-      // Estructura de filas del Excel con los datos faltantes añadidos a la cabecera
       const dataRows = [
         ["FORMULARIO GABARRÓ", ""],
         ["Tipo:", tipo],
@@ -1346,7 +1329,7 @@
         ["Email:", email],
         ["Teléfono:", telefono],
         [],
-        ["Canteado", "Etiqueta", "Material", "Grueso", "Largo", "Ancho", "Uds"] // Cabecera de tabla corregida de Ref a Etiqueta
+        ["Canteado", "Etiqueta", "Material", "Grueso", "Largo", "Ancho", "Uds"]
       ];
 
       rows.forEach(row => {
