@@ -4,10 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Plantilla Producción Gabarró + Estimador</title>
-  <!-- Librería para Excel -->
+  <title>Plantilla Production Gabarró + Estimador</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Iconos (Lucide) - Versión UMD estable -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 
   <style>
@@ -693,7 +691,6 @@
 
   <div class="container">
 
-    <!-- CABECERA -->
     <header class="header">
       <div class="brand">
         <h1>GABARRÓ</h1>
@@ -712,7 +709,6 @@
       </div>
     </header>
 
-    <!-- FORMULARIO DATOS (OPTIMIZADO FILA ÚNICA) -->
     <div class="card">
       <div class="section-title"><i data-lucide="user"></i> Datos del Cliente</div>
       <div class="grid-form">
@@ -739,9 +735,7 @@
       </div>
     </div>
 
-    <!-- ESTADISTICAS Y ESTIMADOR -->
     <div class="stats-container">
-      <!-- Barra Principal -->
       <div class="stats-bar">
         <span><i data-lucide="calculator" style="margin-right: 8px; vertical-align: middle;"></i> Resumen Total</span>
 
@@ -752,7 +746,6 @@
           <span style="opacity: 0.3">|</span>
           <span id="totalCanto" style="color: var(--canto-color);">0.00 ml Canto</span>
 
-          <!-- Activador Estimador -->
           <label class="estimator-toggle" title="Activar estimación de costes">
             <span style="font-size: 0.8rem; font-weight: normal;">Estimador Costes</span>
             <input type="checkbox" id="estimatorCheck" style="display:none" onchange="toggleEstimator()">
@@ -761,29 +754,24 @@
         </div>
       </div>
 
-      <!-- Panel Fecha de Entrega -->
       <div id="deliveryInfoPanel">
         <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div style="display:flex; align-items:center; gap:8px;">
             <i data-lucide="truck" style="color:var(--primary);"></i>
             <div>
               <div style="font-weight:700; color:var(--primary); font-size:0.95rem;">FECHA ESTIMADA DE ENTREGA</div>
-              <div style="font-size:0.75rem; color:var(--text-muted);">Considerando pedido antes de las 15:00h (días
-                hábiles)</div>
+              <div style="font-size:0.75rem; color:var(--text-muted);">Considerando pedido antes de las 15:00h (días hábiles)</div>
             </div>
           </div>
           <div style="text-align:right;">
-            <div id="deliveryDateDisplay" style="font-size:1.2rem; font-weight:800; color:var(--text);">Calculando...
-            </div>
+            <div id="deliveryDateDisplay" style="font-size:1.2rem; font-weight:800; color:var(--text);">Calculando...</div>
             <div style="font-size:0.7rem; color:var(--danger); font-weight:600;">*Sujeto a ruta y disponibilidad</div>
           </div>
         </div>
       </div>
 
-      <!-- Panel Estimador (Oculto) -->
       <div id="estimatorPanel">
         <div class="estimator-grid">
-          <!-- 1. Configuración y Tableros (Combinado) -->
           <div class="estimator-result config-box">
             <div class="config-input-group">
               <label style="font-size:0.7rem; color:var(--text-muted)">Medida Tablero Ref.</label>
@@ -806,7 +794,6 @@
             </div>
           </div>
 
-          <!-- 2. Coste Corte -->
           <div class="estimator-result">
             <span style="font-size:0.75rem; color:var(--text-muted)">Servicio Corte</span>
             <span class="price-tag" id="estCortePrice">0,00 €</span>
@@ -814,14 +801,12 @@
             <span class="sub-info" id="estLabelInfo" style="color:var(--danger); display:none;"></span>
           </div>
 
-          <!-- 3. Coste Canto -->
           <div class="estimator-result">
             <span style="font-size:0.75rem; color:var(--text-muted)">Servicio Canteado</span>
             <span class="price-tag" id="estCantoPrice">0,00 €</span>
             <span class="sub-info" id="estCantoInfo">0 ml</span>
           </div>
 
-          <!-- 4. Total -->
           <div class="estimator-result total">
             <span style="font-size:0.75rem; font-weight:bold; color:var(--secondary)">TOTAL SERVICIOS</span>
             <span class="price-tag" style="font-size: 1.4rem;" id="estTotal">0,00 €</span>
@@ -834,12 +819,10 @@
       </div>
     </div>
 
-    <!-- TABLA DE MEDIDAS -->
     <form id="corteForm">
       <div style="text-align: center; color: var(--danger); font-weight: bold; margin-bottom: 10px; font-size: 0.9rem;">
         ⚠ IMPORTANTE: El LARGO es siempre la dirección de la veta<br>
-        <span style="font-size: 0.8rem; font-weight: 500;">(Las piezas que incluyan "Referencia" tendrán un recargo por
-          servicio de etiquetado)</span>
+        <span style="font-size: 0.8rem; font-weight: 500;">(Las piezas que incluyan "Referencia" tendrán un recargo por servicio de etiquetado)</span>
       </div>
 
       <table class="table-responsive" id="dataTable">
@@ -856,17 +839,14 @@
           </tr>
         </thead>
         <tbody id="tableBody">
-          <!-- Las filas se generan con JS -->
-        </tbody>
+          </tbody>
       </table>
 
-      <!-- BOTÓN AGREGAR -->
       <button type="button" class="btn btn-outline" id="addRow"
         style="width: 100%; margin-top: 15px; border-style: dashed; justify-content: center;">
         <i data-lucide="plus-circle"></i> Añadir Pieza
       </button>
 
-      <!-- LEYENDA -->
       <div style="margin-top: 15px; text-align: right;">
         <span class="legend-toggle" onclick="toggleLegend()">¿Qué significan los códigos de canto?</span>
         <div id="legendBox" class="legend-content" style="text-align: left;">
@@ -878,7 +858,6 @@
         </div>
       </div>
 
-      <!-- BOTONES FINALES -->
       <div class="action-bar">
         <button type="button" class="btn btn-danger" id="clearTableBtn" style="font-size: 0.9rem;">
           <i data-lucide="trash-2"></i> Borrar Todo
@@ -940,7 +919,7 @@
       }
     };
 
-    // --- FUNCIONES (DEFINIDAS GLOBALMENTE PARA EVITAR ERRORES DE REFERENCIA) ---
+    // --- FUNCIONES ---
 
     function setCurrentDate() {
       const d = new Date();
@@ -1086,7 +1065,7 @@
         // Lógica de Etiquetas (Referencia)
         const refText = row.querySelector(".input-ref").value.trim();
         if (refText !== "") {
-          const labelTimeForPieces = uds * 0.925; // 0.925 mins extra por pieza etiquetada
+          const labelTimeForPieces = uds * 0.925;
           lineTime += labelTimeForPieces;
           totalLabelMinutes += labelTimeForPieces;
         }
@@ -1187,7 +1166,6 @@
       totalCantoEl.textContent = `${totalML.toFixed(2)} ml Canto`;
     }
 
-    // Funciones de utilidad UI
     window.updatePreviewBox = function (select) {
       const val = select.value;
       const box = select.nextElementSibling;
@@ -1201,7 +1179,6 @@
       }
     }
 
-    // Funciones vinculadas a eventos HTML (excluyendo las que requieren parámetros de evento)
     window.saveAndRecalc = function () {
       window.saveData();
       updateStats();
@@ -1347,18 +1324,29 @@
       const rows = tableBody.querySelectorAll("tr");
 
       let hasData = false;
-      rows.forEach(row => { if (row.querySelector(".input-mat").value || (row.querySelector(".input-largo").value && row.querySelector(".input-ancho").value)) hasData = true; });
+      rows.forEach(row => { 
+        if (row.querySelector(".input-mat").value || (row.querySelector(".input-largo").value && row.querySelector(".input-ancho").value)) hasData = true; 
+      });
       if (!hasData) { alert("Tabla vacía."); return; }
       if (!nombre) { alert("Indica el Nombre."); return; }
 
       const tipo = document.querySelector('input[name="tipoPedido"]:checked').value;
+      const email = document.getElementById("email").value.trim();
+      const telefono = document.getElementById("telefono").value.trim();
+      const codigoCliente = document.getElementById("codigoCliente").value.trim();
+      const fecha = document.getElementById("fecha").value;
+
+      // Estructura de filas del Excel con los datos faltantes añadidos a la cabecera
       const dataRows = [
         ["FORMULARIO GABARRÓ", ""],
         ["Tipo:", tipo],
+        ["Fecha:", fecha],
         ["Cliente:", nombre],
-        ["Teléfono:", document.getElementById("telefono").value],
+        ["Código Cliente:", codigoCliente],
+        ["Email:", email],
+        ["Teléfono:", telefono],
         [],
-        ["Canteado", "Ref", "Material", "Grueso", "Largo", "Ancho", "Uds"]
+        ["Canteado", "Etiqueta", "Material", "Grueso", "Largo", "Ancho", "Uds"] // Cabecera de tabla corregida de Ref a Etiqueta
       ];
 
       rows.forEach(row => {
@@ -1373,13 +1361,16 @@
         ]);
       });
 
-      // Eliminada la sección de estimaciones del Excel a petición del usuario
-
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(dataRows);
       ws['!cols'] = [{ wch: 15 }, { wch: 25 }, { wch: 30 }, { wch: 8 }, { wch: 10 }, { wch: 10 }, { wch: 8 }];
       XLSX.utils.book_append_sheet(wb, ws, "Produccion");
       XLSX.writeFile(wb, `Gabarro_${nombre.replace(/ /g, '_')}.xlsx`);
+    }
+
+    function toggleLegend() {
+      const box = document.getElementById("legendBox");
+      box.classList.toggle("show");
     }
 
     // --- EVENTOS DE CARGA ---
@@ -1388,10 +1379,7 @@
         lucide.createIcons();
       }
 
-      // ESTABLECER FECHA ACTUAL SIEMPRE AL INICIO
       setCurrentDate();
-
-      // Cargar datos guardados (esto puede sobreescribir otros campos, pero no la fecha si no se guarda)
       loadData();
 
       if (tableBody.children.length === 0) window.addNewRow();
@@ -1400,7 +1388,6 @@
       window.updateDeliveryUI();
     });
 
-    // Event listeners para botones estáticos
     document.getElementById("addRow").addEventListener("click", () => window.addNewRow());
     document.getElementById("clearTableBtn").addEventListener("click", function () {
       if (confirm("¿Estás seguro de vaciar toda la tabla?")) {
@@ -1410,7 +1397,6 @@
         window.saveAndRecalc();
       }
     });
-
   </script>
 </body>
 
